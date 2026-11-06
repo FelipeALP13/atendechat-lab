@@ -163,6 +163,37 @@ const useStyles = makeStyles(theme => ({
     overflow: "hidden",
     "& > #drawer-container": { height: "100%" },
     "& .MuiPaper-outlined": { borderColor: theme.palette.divider },
+    "& [class*='messagesListWrapper']": {
+      background:
+        theme.palette.type === "dark"
+          ? "radial-gradient(circle at 50% 20%, rgba(109,57,232,.10), transparent 42%), #151724"
+          : "radial-gradient(circle at 50% 16%, rgba(109,57,232,.055), transparent 44%), #fafafe",
+    },
+    "& [class*='messageLeft']": {
+      borderRadius: "4px 16px 16px 16px",
+      border: `1px solid ${theme.palette.divider}`,
+      boxShadow: theme.palette.type === "dark" ? "0 5px 16px rgba(0,0,0,.14)" : "0 5px 16px rgba(48,39,82,.07)",
+    },
+    "& [class*='messageRight']": {
+      borderRadius: "16px 4px 16px 16px",
+      boxShadow: theme.palette.type === "dark" ? "0 5px 16px rgba(0,0,0,.14)" : "0 5px 16px rgba(48,39,82,.07)",
+    },
+    "& [class*='newMessageBox']": {
+      padding: theme.spacing(1, 1.5),
+      gap: theme.spacing(.5),
+      borderTop: `1px solid ${theme.palette.divider}`,
+      background: theme.palette.background.paper,
+    },
+    "& [class*='messageInputWrapper']": {
+      minHeight: 46,
+      borderRadius: 14,
+      border: `1px solid ${theme.palette.divider}`,
+      boxShadow: theme.palette.type === "dark" ? "none" : "0 4px 14px rgba(48,39,82,.05)",
+    },
+    "& #TicketHeader": {
+      borderBottom: `1px solid ${theme.palette.divider}`,
+      background: theme.palette.background.paper,
+    },
   },
   empty: {
     height: "100%",
@@ -691,7 +722,7 @@ const TicketsV2 = () => {
               })}
               aria-label="Lista de atendimentos"
             >
-              <TicketsManagerTabs routeBase={V2_ROUTE} />
+              <TicketsManagerTabs routeBase={V2_ROUTE} modern />
             </section>
 
             <section

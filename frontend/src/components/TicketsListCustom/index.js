@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useReducer, useContext, useMemo } from "react";
+import clsx from "clsx";
 
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -68,6 +69,15 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+    },
+    modernListWrapper: {
+        border: 0,
+        background: theme.palette.background.paper,
+    },
+    modernList: {
+        padding: theme.spacing(0.5, 0.75, 1),
+        borderTop: "0 !important",
+        background: theme.palette.background.paper,
     },
 }));
 
@@ -213,7 +223,8 @@ const TicketsListCustom = (props) => {
         statusFilter,
         userFilter,
         sortTickets,
-        routeBase = "/tickets"
+        routeBase = "/tickets",
+        modern = false
     } = props;
 
     const classes = useStyles();
@@ -405,12 +416,15 @@ const TicketsListCustom = (props) => {
     }
 
     return (
-        <Paper className={classes.ticketsListWrapper} style={style}>
+        <Paper
+            className={clsx(classes.ticketsListWrapper, modern && classes.modernListWrapper)}
+            style={style}
+        >
             <Paper
                 square
                 name="closed"
                 elevation={0}
-                className={classes.ticketsList}
+                className={clsx(classes.ticketsList, modern && classes.modernList)}
                 onScroll={handleScroll}
             >
                 <List style={{ paddingTop: 0 }} >
@@ -433,6 +447,7 @@ const TicketsListCustom = (props) => {
                                     key={ticket.id}
                                     setTabOpen={setTabOpen}
                                     routeBase={routeBase}
+                                    modern={modern}
                                 />
                                 // </List>
                             ))}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
+import clsx from "clsx";
 import { useTheme } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
 import {
@@ -385,9 +386,71 @@ const useStyles = makeStyles((theme) => ({
   activeIcon: {
     color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
   },
+  modernRoot: {
+    border: "0 !important",
+    borderRadius: "0 !important",
+    background: theme.palette.background.paper,
+  },
+  modernHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: theme.spacing(1.75, 1.75, 0.75),
+  },
+  modernTitle: {
+    margin: 0,
+    color: theme.palette.text.primary,
+    fontSize: 18,
+    fontWeight: 900,
+    letterSpacing: "-.02em",
+  },
+  modernSubtitle: {
+    marginTop: 2,
+    color: theme.palette.text.secondary,
+    fontSize: 10.5,
+  },
+  modernCounter: {
+    minWidth: 30,
+    height: 25,
+    display: "grid",
+    placeItems: "center",
+    padding: "0 8px",
+    color: theme.palette.primary.main,
+    borderRadius: 999,
+    background: theme.palette.type === "dark" ? "#302849" : "#eee9ff",
+    fontSize: 10,
+    fontWeight: 900,
+  },
+  modernSearch: {
+    height: 42,
+    margin: theme.spacing(0.75, 1.25),
+    padding: theme.spacing(0, 0.5),
+    border: "1px solid transparent",
+    borderRadius: 12,
+    background: theme.palette.type === "dark" ? "#20222d" : "#f4f5f8",
+    "&:focus-within": {
+      borderColor: theme.palette.primary.light,
+      background: theme.palette.background.paper,
+      boxShadow: `0 0 0 3px ${theme.palette.primary.main}12`,
+    },
+  },
+  modernOptions: {
+    margin: theme.spacing(0.5, 1.25, 0.75),
+    padding: theme.spacing(0.5),
+    border: 0,
+    borderRadius: 12,
+    background: theme.palette.type === "dark" ? "#1f212b" : "#f8f8fb",
+  },
+  modernTabsV2: {
+    minHeight: 48,
+    margin: theme.spacing(0, 1.25, 0.75),
+    padding: 3,
+    borderRadius: 12,
+    background: theme.palette.type === "dark" ? "#20222d" : "#f3f4f8",
+  },
 }));
 
-const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
+const TicketsManagerTabs = ({ routeBase = "/tickets", modern = false }) => {
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
@@ -620,14 +683,27 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
   };
 
   return (
-    <Paper elevation={0} variant="outlined" className={classes.ticketsWrapper}>
+    <Paper
+      elevation={0}
+      variant="outlined"
+      className={clsx(classes.ticketsWrapper, modern && classes.modernRoot)}
+    >
+      {modern && (
+        <div className={classes.modernHeader}>
+          <div>
+            <h2 className={classes.modernTitle}>Conversas</h2>
+            <div className={classes.modernSubtitle}>Organize, responda e acompanhe sua equipe</div>
+          </div>
+          <span className={classes.modernCounter}>{openCount + pendingCount}</span>
+        </div>
+      )}
       <NewTicketModal
         modalOpen={newTicketModalOpen}
         onClose={(ticket) => {
           handleCloseOrOpenTicket(ticket);
         }}
       />
-      <div className={classes.serachInputWrapper}>
+      <div className={clsx(classes.serachInputWrapper, modern && classes.modernSearch)}>
         <SearchIcon className={classes.searchIcon} />
         <InputBase
           className={classes.searchInput}
@@ -683,7 +759,11 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
         </>
       )}
 
-      <Paper square elevation={0} className={classes.ticketOptionsBox}>
+      <Paper
+        square
+        elevation={0}
+        className={clsx(classes.ticketOptionsBox, modern && classes.modernOptions)}
+      >
         <Grid container alignItems="center">
           <Grid item>
             <Can
@@ -918,7 +998,7 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
           variant="fullWidth"
           scrollButtons="auto"
           TabIndicatorProps={{ className: classes.tabIndicator }}
-          className={classes.modernTabs}
+          className={clsx(classes.modernTabs, modern && classes.modernTabsV2)}
         >
           {/* ATENDENDO */}
           <Tab
@@ -1046,6 +1126,7 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
         <Paper className={classes.ticketsWrapper}>
           <TicketsList
             routeBase={routeBase}
+            modern={modern}
             status="open"
             showAll={showAllTickets}
             sortTickets={sortTickets ? "ASC" : "DESC"}
@@ -1056,6 +1137,7 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
           />
           <TicketsList
             routeBase={routeBase}
+            modern={modern}
             status="pending"
             selectedQueueIds={selectedQueueIds}
             sortTickets={sortTickets ? "ASC" : "DESC"}
@@ -1067,6 +1149,7 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
           {user.allowGroup && (
             <TicketsList
               routeBase={routeBase}
+              modern={modern}
               status="group"
               showAll={showAllTickets}
               sortTickets={sortTickets ? "ASC" : "DESC"}
@@ -1082,6 +1165,7 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
       <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
         <TicketsList
           routeBase={routeBase}
+          modern={modern}
           status="closed"
           showAll={showAllTickets}
           selectedQueueIds={selectedQueueIds}
@@ -1094,6 +1178,7 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
           <>
             <TicketsList
               routeBase={routeBase}
+              modern={modern}
               statusFilter={selectedStatus}
               searchParam={searchParam}
               showAll={showAllTickets}
@@ -1111,6 +1196,7 @@ const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
         {profile === "user" && (
           <TicketsList
             routeBase={routeBase}
+            modern={modern}
             statusFilter={selectedStatus}
             searchParam={searchParam}
             showAll={false}

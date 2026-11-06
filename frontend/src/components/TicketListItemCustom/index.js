@@ -228,10 +228,36 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       opacity: 0.8,
     },
-  }
+  },
+  modernTicket: {
+    minHeight: 82,
+    width: "calc(100% - 8px)",
+    margin: "4px",
+    padding: theme.spacing(1, 1.25),
+    border: "1px solid transparent",
+    borderRadius: 14,
+    transition: "background .16s ease, border-color .16s ease, transform .16s ease, box-shadow .16s ease",
+    "&:hover": {
+      background: theme.palette.type === "dark" ? "rgba(255,255,255,.045)" : "#faf9ff",
+      borderColor: theme.palette.type === "dark" ? "rgba(255,255,255,.08)" : "#ece7fb",
+      transform: "translateY(-1px)",
+    },
+    "&.Mui-selected, &.Mui-selected:hover": {
+      background: theme.palette.type === "dark" ? "rgba(109,57,232,.20)" : "#f1ecff",
+      borderColor: theme.palette.type === "dark" ? "rgba(167,133,255,.42)" : "#d9ccfb",
+      boxShadow: "inset 3px 0 0 #6d39e8, 0 5px 16px rgba(67,42,126,.07)",
+    },
+  },
+  modernAvatar: {
+    boxShadow: "0 0 0 3px rgba(109,57,232,.10)",
+  },
+  modernContactName: {
+    fontWeight: 800,
+    letterSpacing: "-.01em",
+  },
 }));
 
-const TicketListItemCustom = ({ setTabOpen, ticket, routeBase = "/tickets" }) => {
+const TicketListItemCustom = ({ setTabOpen, ticket, routeBase = "/tickets", modern = false }) => {
   const classes = useStyles();
   const theme = useTheme();
   const history = useHistory();
@@ -603,19 +629,19 @@ const TicketListItemCustom = ({ setTabOpen, ticket, routeBase = "/tickets" }) =>
           handleSelectTicket(ticket);
         }}
         selected={ticketId && ticketId === ticket.uuid}
-        className={clsx(classes.ticket, {
+        className={clsx(classes.ticket, modern && classes.modernTicket, {
           [classes.pendingTicket]: ticket.status === "pending",
         })}
       >
-        <ListItemAvatar style={{ marginLeft: "-15px" }}>
+        <ListItemAvatar style={{ marginLeft: modern ? "0" : "-15px", minWidth: modern ? 54 : undefined }}>
           <Avatar
             style={{
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
+              width: modern ? "44px" : "50px",
+              height: modern ? "44px" : "50px",
+              borderRadius: modern ? "14px" : "50%",
             }}
             src={`${ticket?.contact?.urlPicture}`}
-            className={classes.clickableAvatar}
+            className={clsx(classes.clickableAvatar, modern && classes.modernAvatar)}
             onClick={handleImageClick}
           />
         </ListItemAvatar>
@@ -624,6 +650,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket, routeBase = "/tickets" }) =>
           primary={
             <span className={classes.contactNameWrapper}>
               <Typography
+                className={modern ? classes.modernContactName : undefined}
                 noWrap
                 component="span"
                 variant="body2"
