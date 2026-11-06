@@ -35,7 +35,8 @@ import Ticket from "../../components/Ticket";
 import TicketsManagerTabs from "../../components/TicketsManagerTabs";
 import { QueueSelectedProvider } from "../../context/QueuesSelected/QueuesSelectedContext";
 
-const V2_ROUTE = "/tickets-v2";
+const V2_ROUTE = "/tickets";
+const CLASSIC_ROUTE = "/tickets-classic";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -669,7 +670,7 @@ const TicketsV2 = () => {
                 <div className={classes.title}>Central de atendimento</div>
                 <div className={classes.subtitle}>Nova experiência, mesmas funcionalidades</div>
               </div>
-              <Chip className={classes.beta} label="V2 BETA" size="small" />
+              <Chip className={classes.beta} label="ATENDIMENTO" size="small" />
             </div>
             <div className={classes.topActions}>
               <span className={classes.preserved}>
@@ -701,15 +702,15 @@ const TicketsV2 = () => {
                   </Button>
                 </Tooltip>
               )}
-              <Tooltip title="Retornar para a interface atual">
+              <Tooltip title="Abrir a versão anterior para conferência">
                 <Button
                   className={classes.classicButton}
-                  onClick={() => history.push("/tickets")}
+                  onClick={() => history.push(CLASSIC_ROUTE)}
                   size={isSmall ? "small" : "medium"}
                   startIcon={<ArrowBack />}
                   variant="outlined"
                 >
-                  Interface atual
+                  Versão anterior
                 </Button>
               </Tooltip>
             </div>

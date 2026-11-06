@@ -140,8 +140,14 @@ const RoutesContent = () => {
                 />
                 <Route
                   exact
-                  path="/tickets/:ticketId?"
+                  path="/tickets-classic/:ticketId?"
                   component={TicketResponsiveContainer}
+                  isPrivate
+                />
+                <Route
+                  exact
+                  path="/tickets/:ticketId?"
+                  component={TicketsV2}
                   isPrivate
                 />
                 <Route

@@ -439,8 +439,10 @@ const MainListItems = ({ collapsed, drawerClose }) => {
     location.pathname.startsWith("/campaigns-config");
 
   useEffect(() => {
-    if (location.pathname.startsWith("/tickets-v2")) {
-      setActiveMenu("/tickets-v2");
+    if (location.pathname.startsWith("/tickets-classic")) {
+      setActiveMenu("/tickets-classic");
+    } else if (location.pathname.startsWith("/tickets-v2")) {
+      setActiveMenu("/tickets");
     } else if (location.pathname.startsWith("/tickets")) {
       setActiveMenu("/tickets");
     } else {
@@ -690,11 +692,10 @@ const MainListItems = ({ collapsed, drawerClose }) => {
 
       {user.profile === "admin" && (
         <ListItemLink
-          to="/tickets-v2"
-          primary="Atendimentos V2"
+          to="/tickets-classic"
+          primary="Interface anterior"
           icon={<StarOutlineIcon />}
           tooltip={collapsed}
-          showBadge
         />
       )}
 
