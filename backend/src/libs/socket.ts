@@ -12,9 +12,20 @@ import BirthdayService from "../services/BirthdayService/BirthdayService";
 let io: SocketIO;
 
 export const initIO = (httpServer: Server): SocketIO => {
+  const configuredOrigins = (process.env.FRONTEND_URL || "")
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
+  const localDevelopmentOrigins =
+    process.env.NODE_ENV === "development"
+      ? ["http://localhost:3000", "http://127.0.0.1:3000"]
+      : [];
+
   io = new SocketIO(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL
+      origin: Array.from(
+        new Set([...configuredOrigins, ...localDevelopmentOrigins])
+      )
     }
   });
 

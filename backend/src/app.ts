@@ -45,7 +45,17 @@ app.set("queues", {
   sendScheduledMessages
 });
 
-const allowedOrigins = [process.env.FRONTEND_URL];
+const configuredOrigins = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
+const localDevelopmentOrigins =
+  process.env.NODE_ENV === "development"
+    ? ["http://localhost:3000", "http://127.0.0.1:3000"]
+    : [];
+const allowedOrigins = Array.from(
+  new Set([...configuredOrigins, ...localDevelopmentOrigins])
+);
 
 // Configuração do BullBoard
 if (String(process.env.BULL_BOARD).toLocaleLowerCase() === 'true' && process.env.REDIS_URI_ACK !== '') {
