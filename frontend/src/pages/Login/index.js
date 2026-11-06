@@ -61,7 +61,10 @@ const useStyles = makeStyles((theme) => {
         boxSizing: "border-box",
         overflow: "hidden",
         position: "relative",
-        backgroundColor: theme.palette.type === "light" ? "#f8f7fc" : "#11131f",
+        background:
+            theme.palette.type === "light"
+                ? "radial-gradient(circle at 82% 18%, rgba(109,57,232,.08), transparent 28%), #f8f7fc"
+                : "radial-gradient(circle at 82% 18%, rgba(109,57,232,.14), transparent 28%), #11131f",
         backgroundImage: "none",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
@@ -79,22 +82,29 @@ const useStyles = makeStyles((theme) => {
 
     containerLogin: {
         padding: "32px",
-        width: "44%",
+        width: "44% !important",
+        minWidth: "44%",
+        height: "100%",
         zIndex: 10,
-        left: "auto",
-        right: 0,
-        top: "50%",
-        transform: "translateY(-50%)",
+        left: "auto !important",
+        right: "0 !important",
+        top: "0 !important",
+        transform: "none !important",
         position: "absolute",
-        maxWidth: "560px",
-        margin: 0,
+        maxWidth: "none !important",
+        margin: "0 !important",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxSizing: "border-box",
 
         [theme.breakpoints.down("sm")]: {
-            width: "calc(100% - 40px)",
+            width: "100% !important",
+            minWidth: "100%",
             maxWidth: "460px",
-            left: "50%",
-            right: "auto",
-            transform: "translate(-50%, -50%)",
+            left: "0 !important",
+            right: "0 !important",
+            padding: "24px",
         },
         
         [theme.breakpoints.down("xs")]: {
@@ -117,7 +127,7 @@ const useStyles = makeStyles((theme) => {
         alignItems: "center",
         padding: "42px 38px 34px",
         borderRadius: "24px",
-        maxWidth: "420px",
+        maxWidth: "430px",
         width: "100%",
         margin: "0 auto",
         border: `1px solid ${theme.palette.divider}`,
@@ -176,22 +186,18 @@ const useStyles = makeStyles((theme) => {
 
     submit: {
         margin: theme.spacing(3, 0, 2),
-        background: mode === "light" 
-            ? `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})` 
-            : `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+        background: "linear-gradient(135deg, #7545ed 0%, #5723be 100%)",
         color: "white",
         borderRadius: "12px",
         padding: "12px 0",
         fontSize: "16px",
         fontWeight: 600,
         textTransform: "none",
-        boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
+        boxShadow: "0 9px 22px rgba(87,35,190,.26)",
         border: "none",
         transition: "all 0.3s ease",
         "&:hover": {
-            background: mode === "light"
-                ? `linear-gradient(45deg, ${theme.palette.primary.dark}, ${theme.palette.primary.dark})`
-                : `linear-gradient(45deg, ${theme.palette.primary.dark}, ${theme.palette.primary.dark})`,
+            background: "linear-gradient(135deg, #8255f1 0%, #6530cf 100%)",
             transform: "translateY(-2px)",
             boxShadow: `0 6px 20px ${theme.palette.primary.main}66`,
         },
@@ -375,7 +381,7 @@ const useStyles = makeStyles((theme) => {
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
-        padding: "clamp(48px, 7vw, 110px)",
+        padding: "clamp(44px, 6vw, 92px)",
         color: "#fff",
         textAlign: "left",
         background: "linear-gradient(145deg, #7b4df0 0%, #5c2ac7 52%, #361278 100%)",
@@ -417,7 +423,7 @@ const useStyles = makeStyles((theme) => {
     brandTitle: {
         margin: 0,
         maxWidth: 560,
-        fontSize: "clamp(34px, 4vw, 58px)",
+        fontSize: "clamp(34px, 3.7vw, 54px)",
         fontWeight: 900,
         lineHeight: 1.02,
         letterSpacing: "-.045em",
@@ -452,6 +458,23 @@ const useStyles = makeStyles((theme) => {
         margin: "7px 0 14px",
         color: theme.palette.text.secondary,
         fontSize: 12,
+    },
+    secureAccess: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 7,
+        marginTop: 4,
+        color: theme.palette.text.secondary,
+        fontSize: 10.5,
+        "&:before": {
+            content: '""',
+            width: 7,
+            height: 7,
+            borderRadius: "50%",
+            background: "#20b486",
+            boxShadow: "0 0 0 3px rgba(32,180,134,.12)",
+        },
     },
 })});
 
@@ -734,6 +757,9 @@ const Login = () => {
                             >
                                 {i18n.t("login.buttons.submit")}
                             </Button>
+                            <div className={classes.secureAccess}>
+                                Ambiente seguro e dados protegidos
+                            </div>
                             {allowSignup && (
                                 <Grid container justifyContent="center">
                                     <Grid item>
