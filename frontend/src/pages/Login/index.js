@@ -114,14 +114,12 @@ const useStyles = makeStyles((theme) => {
     },
 
     paper: {
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: theme.palette.type === "dark" ? "#191b29" : "#ffffff",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        boxShadow: `
-      0 24px 70px rgba(38, 31, 71, 0.12),
-      0 1px 0 rgba(255, 255, 255, 0.2) inset,
-      0 0 0 1px rgba(255, 255, 255, 0.1)
-    `,
+        boxShadow: theme.palette.type === "dark"
+            ? "0 28px 80px rgba(0, 0, 0, .42), 0 1px 0 rgba(255, 255, 255, .04) inset"
+            : "0 24px 70px rgba(38, 31, 71, .12), 0 1px 0 rgba(255, 255, 255, .2) inset",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -130,7 +128,9 @@ const useStyles = makeStyles((theme) => {
         maxWidth: "430px",
         width: "100%",
         margin: "0 auto",
-        border: `1px solid ${theme.palette.divider}`,
+        border: theme.palette.type === "dark"
+            ? "1px solid rgba(178, 161, 224, .22)"
+            : `1px solid ${theme.palette.divider}`,
         animation: "$slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
         position: "relative",
         boxSizing: "border-box",
@@ -228,11 +228,14 @@ const useStyles = makeStyles((theme) => {
         right: 15,
         background: theme.palette.type === "light" ? "#f3f1f8" : "#20222d",
         backdropFilter: "blur(10px)",
-        border: "1px solid rgba(255, 255, 255, 0.2)",
-        color: "#374151",
+        border: theme.palette.type === "dark"
+            ? "1px solid rgba(178, 161, 224, .24)"
+            : "1px solid rgba(109, 57, 232, .10)",
+        color: theme.palette.type === "dark" ? "#d7cdf2" : "#4b4656",
         transition: "all 0.3s ease",
         "&:hover": {
-            background: "rgba(255, 255, 255, 0.2)",
+            background: theme.palette.type === "dark" ? "#2c2940" : "#ebe6f8",
+            color: theme.palette.type === "dark" ? "#ffffff" : "#6030cf",
             transform: "scale(1.05)",
         },
     },
@@ -244,11 +247,13 @@ const useStyles = makeStyles((theme) => {
             backdropFilter: "blur(10px)",
             transition: "all 0.3s ease",
             "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                backgroundColor: theme.palette.type === "dark" ? "#252838" : "#ffffff",
             },
             "&.Mui-focused": {
-                backgroundColor: "rgba(255, 255, 255, 1)",
-                boxShadow: "0 0 0 3px rgba(109, 57, 232, 0.10)",
+                backgroundColor: theme.palette.type === "dark" ? "#252838" : "#ffffff",
+                boxShadow: theme.palette.type === "dark"
+                    ? "0 0 0 3px rgba(139, 92, 246, .18)"
+                    : "0 0 0 3px rgba(109, 57, 232, .10)",
             },
             "& fieldset": {
                 borderColor: "rgba(109, 57, 232, 0.18)",
@@ -262,11 +267,29 @@ const useStyles = makeStyles((theme) => {
             },
         },
         "& .MuiInputLabel-root": {
-            color: "#6b7280",
+            color: theme.palette.type === "dark" ? "#aaa5b7" : "#6b7280",
             fontWeight: 500,
             "&.Mui-focused": {
                 color: "#6d39e8",
             },
+        },
+        "& .MuiOutlinedInput-input": {
+            color: theme.palette.type === "dark" ? "#f7f4ff" : "#282532",
+            caretColor: theme.palette.type === "dark" ? "#a78bfa" : "#6d39e8",
+        },
+        "& .MuiIconButton-root": {
+            color: `${theme.palette.type === "dark" ? "#b8b1c7" : "#6b7280"} !important`,
+        },
+        "& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus": {
+            WebkitTextFillColor: theme.palette.type === "dark" ? "#f7f4ff" : "#282532",
+            WebkitBoxShadow: theme.palette.type === "dark"
+                ? "0 0 0 1000px #252838 inset"
+                : "0 0 0 1000px #ffffff inset",
+            boxShadow: theme.palette.type === "dark"
+                ? "0 0 0 1000px #252838 inset"
+                : "0 0 0 1000px #ffffff inset",
+            caretColor: theme.palette.type === "dark" ? "#a78bfa" : "#6d39e8",
+            transition: "background-color 9999s ease-out 0s",
         },
     },
 
@@ -275,7 +298,7 @@ const useStyles = makeStyles((theme) => {
         top: "20px",
         left: "20px",
         zIndex: 1000,
-        background: "rgba(255, 255, 255, 0.1)",
+        background: theme.palette.type === "dark" ? "rgba(25, 27, 41, .88)" : "rgba(255, 255, 255, .12)",
         backdropFilter: "blur(10px)",
         borderRadius: "12px",
         border: "1px solid rgba(255, 255, 255, 0.2)",
@@ -303,7 +326,7 @@ const useStyles = makeStyles((theme) => {
         alignItems: "center",
         background: "none",
         border: "none",
-        color: "white",
+        color: theme.palette.type === "dark" ? "#f4f1fa" : "white",
         fontSize: "14px",
         fontWeight: 500,
         cursor: "pointer",
@@ -319,11 +342,13 @@ const useStyles = makeStyles((theme) => {
         top: "100%",
         left: "0",
         marginTop: "8px",
-        background: "rgba(255, 255, 255, 0.95)",
+        background: theme.palette.type === "dark" ? "rgba(31, 33, 47, .98)" : "rgba(255, 255, 255, .95)",
         backdropFilter: "blur(20px)",
         boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
         borderRadius: "12px",
-        border: "1px solid rgba(255, 255, 255, 0.2)",
+        border: theme.palette.type === "dark"
+            ? "1px solid rgba(178, 161, 224, .22)"
+            : "1px solid rgba(255, 255, 255, .2)",
         padding: "8px",
         zIndex: 1000,
         minWidth: "140px",
@@ -332,7 +357,7 @@ const useStyles = makeStyles((theme) => {
     languageOption: {
         background: "none",
         border: "none",
-        color: "#374151",
+        color: theme.palette.type === "dark" ? "#e7e2ef" : "#374151",
         display: "flex",
         alignItems: "center",
         gap: "8px",
@@ -361,12 +386,12 @@ const useStyles = makeStyles((theme) => {
         bottom: "20px",
         right: "20px",
         zIndex: 1000,
-        background: "rgba(255, 255, 255, 0.1)",
+        background: theme.palette.type === "dark" ? "rgba(25, 27, 41, .88)" : "rgba(255, 255, 255, .1)",
         backdropFilter: "blur(10px)",
         borderRadius: "8px",
         border: "1px solid rgba(255, 255, 255, 0.2)",
         padding: "6px 12px",
-        color: "white",
+        color: theme.palette.type === "dark" ? "#e7e2ef" : "white",
         fontSize: "12px",
         fontWeight: 500,
         opacity: 0.8,
@@ -453,6 +478,7 @@ const useStyles = makeStyles((theme) => {
         fontSize: 21,
         fontWeight: 900,
         letterSpacing: "-.025em",
+        color: theme.palette.type === "dark" ? "#f8f5ff" : theme.palette.text.primary,
     },
     loginSubtitle: {
         margin: "7px 0 14px",
@@ -740,7 +766,6 @@ const Login = () => {
                                                 aria-label="toggle password visibility"
                                                 onClick={togglePasswordVisibility}
                                                 edge="end"
-                                                style={{ color: "#6b7280" }}
                                             >
                                                 {showPassword ? <VisibilityOff /> : <Visibility />}
                                             </IconButton>
