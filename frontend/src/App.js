@@ -21,10 +21,13 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [locale, setLocale] = useState();
-  const appColorLocalStorage =
+  const storedPrimaryColor =
     localStorage.getItem("primaryColorLight") ||
-    localStorage.getItem("primaryColorDark") ||
-    "#065183";
+    localStorage.getItem("primaryColorDark");
+  const appColorLocalStorage =
+    !storedPrimaryColor || storedPrimaryColor.toLowerCase() === "#065183"
+      ? "#6d39e8"
+      : storedPrimaryColor;
   const appNameLocalStorage = localStorage.getItem("appName") || "";
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const preferredTheme = window.localStorage.getItem("preferredTheme");
@@ -174,13 +177,14 @@ const App = () => {
           },
 
           shape: {
-            borderRadius: 8, // Bordas arredondadas mas não excessivas
+            borderRadius: 12,
           },
           overrides: {
             // Botões usando cor do tema
             MuiButton: {
               root: {
-                borderRadius: 8,
+                minHeight: 38,
+                borderRadius: 11,
                 textTransform: 'none',
                 fontWeight: 600,
                 letterSpacing: '0.025em',
@@ -193,7 +197,7 @@ const App = () => {
                 }
               },
               contained: {
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                boxShadow: '0 5px 14px rgba(67, 42, 126, 0.14)',
                 '&:hover': {
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
                 }
@@ -233,7 +237,7 @@ const App = () => {
                 width: '100%',
               },
               rounded: {
-                borderRadius: 12,
+                borderRadius: 16,
               },
               elevation1: {
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
@@ -252,6 +256,10 @@ const App = () => {
                 width: 'auto !important',
                 maxWidth: '300px !important',
                 minWidth: '180px !important',
+                padding: 6,
+                border: mode === 'light' ? '1px solid #ece9f4' : '1px solid #343746',
+                borderRadius: '14px !important',
+                boxShadow: '0 18px 44px rgba(38, 31, 71, .16) !important',
               }
             },
 
@@ -268,7 +276,8 @@ const App = () => {
             MuiTextField: {
               root: {
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 8,
+                  borderRadius: 12,
+                  backgroundColor: mode === 'light' ? '#ffffff' : '#20222d',
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     '& .MuiOutlinedInput-notchedOutline': {
@@ -291,7 +300,8 @@ const App = () => {
                 textTransform: 'none',
                 fontWeight: 600,
                 letterSpacing: '0.025em',
-                borderRadius: '8px 8px 0 0',
+                minHeight: 42,
+                borderRadius: 10,
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   backgroundColor: mode === "light"
@@ -315,6 +325,72 @@ const App = () => {
             MuiAppBar: {
               root: {
                 boxShadow: 'none',
+              }
+            },
+            MuiCard: {
+              root: {
+                border: mode === 'light' ? '1px solid #ebe8f3' : '1px solid #343746',
+                borderRadius: 16,
+                boxShadow: mode === 'light'
+                  ? '0 10px 30px rgba(38, 31, 71, .07)'
+                  : '0 10px 30px rgba(0, 0, 0, .18)',
+              }
+            },
+            MuiDialog: {
+              paper: {
+                borderRadius: 18,
+                border: mode === 'light' ? '1px solid #ebe8f3' : '1px solid #343746',
+                boxShadow: '0 28px 70px rgba(30, 24, 55, .24)',
+              }
+            },
+            MuiDialogTitle: {
+              root: {
+                padding: '20px 24px 14px',
+                '& h2': { fontWeight: 800, letterSpacing: '-.02em' },
+              }
+            },
+            MuiTableCell: {
+              head: {
+                color: mode === 'light' ? '#716b80' : '#b8b4c5',
+                backgroundColor: mode === 'light' ? '#f7f6fb' : '#20222d',
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '.05em',
+                textTransform: 'uppercase',
+              },
+              root: {
+                borderBottom: mode === 'light' ? '1px solid #efedf5' : '1px solid #303340',
+              }
+            },
+            MuiTableRow: {
+              root: {
+                transition: 'background .16s ease',
+                '&:hover': {
+                  backgroundColor: mode === 'light' ? '#faf9ff' : 'rgba(255,255,255,.025)',
+                }
+              }
+            },
+            MuiChip: {
+              root: {
+                borderRadius: 9,
+                fontWeight: 700,
+              }
+            },
+            MuiIconButton: {
+              root: {
+                borderRadius: 11,
+                transition: 'color .16s ease, background .16s ease, transform .16s ease',
+                '&:hover': {
+                  color: mode === 'light' ? primaryColorLight : primaryColorDark,
+                  backgroundColor: mode === 'light' ? '#f1ecff' : 'rgba(109,57,232,.16)',
+                }
+              }
+            },
+            MuiMenuItem: {
+              root: {
+                minHeight: 38,
+                borderRadius: 9,
+                marginBottom: 2,
               }
             }
           },

@@ -40,7 +40,7 @@ const CLASSIC_ROUTE = "/tickets-classic";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: "calc(100% - 48px)",
+    height: "calc(100% - 64px)",
     minHeight: 0,
     padding: theme.spacing(1.25),
     background:

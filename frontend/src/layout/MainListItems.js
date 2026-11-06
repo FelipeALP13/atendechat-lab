@@ -69,7 +69,10 @@ import useCompanySettings from "../hooks/useSettings/companySettings";
 const useStyles = makeStyles((theme) => ({
   listItem: {
     height: "44px",
-    width: "auto",
+    width: "calc(100% - 16px)",
+    margin: "3px 8px",
+    padding: "4px 9px",
+    borderRadius: 12,
     // Remove margin personalizada para manter alinhamento original
     "&:hover $iconHoverActive": {
       backgroundColor: theme.palette.primary.main, // Usa cor do tema
@@ -106,9 +109,9 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: "50%", // Mantém circular original
-    height: 36, // Mantém tamanho original
-    width: 36,  // Mantém tamanho original
+    borderRadius: 10,
+    height: 34,
+    width: 34,
     backgroundColor:
       theme.mode === "light"
         ? "rgba(120,120,120,0.1)"
@@ -224,6 +227,8 @@ const useStyles = makeStyles((theme) => ({
 
   // Estado ativo melhorado mantendo funcionalidade original
   activeItem: {
+    backgroundColor: theme.mode === "light" ? "#f1ecff" : "rgba(109,57,232,.18)",
+    boxShadow: theme.mode === "light" ? "inset 3px 0 0 #6d39e8" : "inset 3px 0 0 #9e7aff",
     "& $iconHoverActive": {
       backgroundColor: theme.palette.primary.main, // Usa cor do tema
       color: "#fff",
@@ -262,7 +267,11 @@ function ListItemLink(props) {
   return (
     <ConditionalTooltip tooltipEnabled={!!tooltip}>
       <li>
-        <ListItem button component={renderLink} className={classes.listItem}>
+        <ListItem
+          button
+          component={renderLink}
+          className={`${classes.listItem} ${isActive ? classes.activeItem : ""}`}
+        >
           {icon ? (
             <ListItemIcon>
               {showBadge ? (

@@ -58,7 +58,7 @@ import { FaGlobe } from "react-icons/fa";
 import { logInfo, logError } from "../utils/logger";
 
 const backendUrl = getBackendUrl();
-const drawerWidth = 240;
+const drawerWidth = 264;
 
 
 const useStyles = makeStyles((theme) => ({
@@ -68,7 +68,10 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("sm")]: {
       height: "calc(100vh - 56px)",
     },
-    backgroundColor: theme.palette.fancyBackground,
+    background:
+      theme.palette.type === "dark"
+        ? "#11131f"
+        : "linear-gradient(145deg, #f8f8fc 0%, #f3f1f9 100%)",
     "& .MuiButton-outlinedPrimary": {
       color: theme.palette.primary.main, // Usa cor do tema
       border: `1px solid ${theme.palette.primary.main}40`,
@@ -99,11 +102,12 @@ const useStyles = makeStyles((theme) => ({
   },
 
   toolbar: {
-    paddingRight: 24,
-    color: theme.palette.dark.main,
-    // Usa a cor primária do tema para o fundo do AppBar
-    background: theme.palette.primary.main, // Mudança principal aqui
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Sombra sutil
+    minHeight: 64,
+    paddingRight: 18,
+    color: theme.palette.text.primary,
+    background: theme.palette.background.paper,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    boxShadow: theme.palette.type === "dark" ? "none" : "0 6px 22px rgba(38,31,71,.055)",
     transition: "all 0.3s ease",
   },
 
@@ -112,12 +116,12 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     padding: "0 8px",
-    minHeight: "48px",
+    minHeight: "64px",
     [theme.breakpoints.down("sm")]: {
       height: "48px",
     },
     // ALTERAÇÃO: Removido o gradiente e definido fundo branco
-    backgroundColor: "#ffffff", // Fundo branco fixo
+    backgroundColor: theme.palette.background.paper,
     borderBottom: `1px solid ${theme.palette.divider}`, // Linha sutil para separação
     transition: "all 0.3s ease",
   },
@@ -149,8 +153,8 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
     fontSize: 14,
-    color: "white",
-    fontWeight: 600,
+    color: theme.palette.text.primary,
+    fontWeight: 700,
     letterSpacing: "0.025em",
   },
 
@@ -165,11 +169,12 @@ const useStyles = makeStyles((theme) => ({
     overflowX: "hidden",
     overflowY: "hidden",
     // Melhorias sutis no drawer
-    borderRight: `1px solid ${theme.mode === "light" ? "#e0e0e0" : "#424242"}`,
+    borderRight: `1px solid ${theme.palette.divider}`,
+    background: theme.palette.background.paper,
     boxShadow:
       theme.mode === "light"
-        ? "2px 0 8px rgba(0, 0, 0, 0.1)"
-        : "2px 0 8px rgba(0, 0, 0, 0.3)",
+        ? "8px 0 28px rgba(38,31,71,.055)"
+        : "8px 0 28px rgba(0,0,0,.20)",
   },
 
   drawerPaperClose: {
@@ -181,12 +186,12 @@ const useStyles = makeStyles((theme) => ({
     }),
     width: theme.spacing(7),
     [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9),
+      width: 76,
     },
   },
 
   appBarSpacer: {
-    minHeight: "48px",
+    minHeight: "64px",
   },
 
   content: {
@@ -194,6 +199,8 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     padding: 0,
     margin: 0,
+    minWidth: 0,
+    background: "transparent",
   },
 
   container: {
@@ -269,7 +276,7 @@ const useStyles = makeStyles((theme) => ({
 
   // Botões da toolbar melhorados
   toolbarButton: {
-    color: "rgba(255, 255, 255, 0.9)",
+    color: theme.palette.text.secondary,
     borderRadius: "8px",
     padding: "8px",
     margin: "0 2px",
@@ -285,7 +292,7 @@ const useStyles = makeStyles((theme) => ({
 
   // Menu hambúrguer com animação sutil
   menuButton: {
-    color: "white",
+    color: theme.palette.text.secondary,
     "&:hover": {
       backgroundColor: "rgba(255, 255, 255, 0.1)",
     },
@@ -768,7 +775,7 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
               edge="start"
               variant="contained"
               aria-label="open drawer"
-              style={{ color: "white" }}
+              style={{ color: "inherit" }}
               onClick={() => setDrawerOpen(!drawerOpen)}
               className={clsx(drawerOpen && classes.menuButtonHidden)}
             >
@@ -819,7 +826,7 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
                   style={{
                     background: "none",
                     border: "none",
-                    color: "white",
+                    color: "inherit",
                     cursor: "pointer",
                     fontSize: "22px",
                     paddingRight: "20px",
@@ -866,9 +873,9 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
 
               <IconButton edge="start" onClick={colorMode.toggleColorMode}>
                 {theme.mode === "dark" ? (
-                  <Brightness7Icon style={{ color: "white" }} />
+                  <Brightness7Icon style={{ color: "inherit" }} />
                 ) : (
-                  <Brightness4Icon style={{ color: "white" }} />
+                  <Brightness4Icon style={{ color: "inherit" }} />
                 )}
               </IconButton>
 
@@ -879,7 +886,7 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
                 aria-label={i18n.t("mainDrawer.appBar.refresh")}
                 color="inherit"
               >
-                <CachedIcon style={{ color: "white" }} />
+                <CachedIcon style={{ color: "inherit" }} />
               </IconButton>
 
               {/* <DarkMode themeToggle={themeToggle} /> */}
