@@ -16,6 +16,7 @@ import Typography from "@material-ui/core/Typography";
 
 import DashboardOutlinedIcon from "@material-ui/icons/DashboardOutlined";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
+import StarOutlineIcon from "@material-ui/icons/StarOutline";
 import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
 import PeopleAltOutlinedIcon from "@material-ui/icons/PeopleAltOutlined";
@@ -438,7 +439,9 @@ const MainListItems = ({ collapsed, drawerClose }) => {
     location.pathname.startsWith("/campaigns-config");
 
   useEffect(() => {
-    if (location.pathname.startsWith("/tickets")) {
+    if (location.pathname.startsWith("/tickets-v2")) {
+      setActiveMenu("/tickets-v2");
+    } else if (location.pathname.startsWith("/tickets")) {
       setActiveMenu("/tickets");
     } else {
       setActiveMenu("");
@@ -684,6 +687,16 @@ const MainListItems = ({ collapsed, drawerClose }) => {
         icon={<WhatsAppIcon />}
         tooltip={collapsed}
       />
+
+      {user.profile === "admin" && (
+        <ListItemLink
+          to="/tickets-v2"
+          primary="Atendimentos V2"
+          icon={<StarOutlineIcon />}
+          tooltip={collapsed}
+          showBadge
+        />
+      )}
 
       <ListItemLink
         to="/quick-messages"

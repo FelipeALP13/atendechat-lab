@@ -212,7 +212,8 @@ const TicketsListCustom = (props) => {
         forceSearch,
         statusFilter,
         userFilter,
-        sortTickets
+        sortTickets,
+        routeBase = "/tickets"
     } = props;
 
     const classes = useStyles();
@@ -431,6 +432,7 @@ const TicketsListCustom = (props) => {
                                     ticket={ticket}
                                     key={ticket.id}
                                     setTabOpen={setTabOpen}
+                                    routeBase={routeBase}
                                 />
                                 // </List>
                             ))}

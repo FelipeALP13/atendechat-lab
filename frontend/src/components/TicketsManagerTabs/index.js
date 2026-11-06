@@ -387,7 +387,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TicketsManagerTabs = () => {
+const TicketsManagerTabs = ({ routeBase = "/tickets" }) => {
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
@@ -470,7 +470,7 @@ const TicketsManagerTabs = () => {
   };
 
   const handleBack = () => {
-    history.push("/tickets");
+    history.push(routeBase);
   };
 
   const handleChangeTab = (e, newValue) => {
@@ -511,7 +511,7 @@ const TicketsManagerTabs = () => {
   const handleCloseOrOpenTicket = (ticket) => {
     setNewTicketModalOpen(false);
     if (ticket !== undefined && ticket.uuid !== undefined) {
-      history.push(`/tickets/${ticket.uuid}`);
+      history.push(`${routeBase}/${ticket.uuid}`);
     }
   };
 
@@ -1045,6 +1045,7 @@ const TicketsManagerTabs = () => {
 
         <Paper className={classes.ticketsWrapper}>
           <TicketsList
+            routeBase={routeBase}
             status="open"
             showAll={showAllTickets}
             sortTickets={sortTickets ? "ASC" : "DESC"}
@@ -1054,6 +1055,7 @@ const TicketsManagerTabs = () => {
             setTabOpen={setTabOpen}
           />
           <TicketsList
+            routeBase={routeBase}
             status="pending"
             selectedQueueIds={selectedQueueIds}
             sortTickets={sortTickets ? "ASC" : "DESC"}
@@ -1064,6 +1066,7 @@ const TicketsManagerTabs = () => {
           />
           {user.allowGroup && (
             <TicketsList
+              routeBase={routeBase}
               status="group"
               showAll={showAllTickets}
               sortTickets={sortTickets ? "ASC" : "DESC"}
@@ -1078,6 +1081,7 @@ const TicketsManagerTabs = () => {
 
       <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
         <TicketsList
+          routeBase={routeBase}
           status="closed"
           showAll={showAllTickets}
           selectedQueueIds={selectedQueueIds}
@@ -1089,6 +1093,7 @@ const TicketsManagerTabs = () => {
         {profile === "admin" && (
           <>
             <TicketsList
+              routeBase={routeBase}
               statusFilter={selectedStatus}
               searchParam={searchParam}
               showAll={showAllTickets}
@@ -1105,6 +1110,7 @@ const TicketsManagerTabs = () => {
 
         {profile === "user" && (
           <TicketsList
+            routeBase={routeBase}
             statusFilter={selectedStatus}
             searchParam={searchParam}
             showAll={false}

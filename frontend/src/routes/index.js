@@ -6,6 +6,7 @@ import moment from "moment";
 import LoggedInLayout from "../layout";
 import Dashboard from "../pages/Dashboard/";
 import TicketResponsiveContainer from "../pages/TicketResponsiveContainer";
+import TicketsV2 from "../pages/TicketsV2";
 import Signup from "../pages/Signup";
 import Login from "../pages/Login/";
 import Connections from "../pages/Connections/";
@@ -131,6 +132,12 @@ const RoutesContent = () => {
                 />
                 <Route exact path="/" component={Dashboard} isPrivate />
                 <Route exact path="/call-historicals" component={CallHistoricals} isPrivate />
+                <Route
+                  exact
+                  path="/tickets-v2/:ticketId?"
+                  component={TicketsV2}
+                  isPrivate
+                />
                 <Route
                   exact
                   path="/tickets/:ticketId?"

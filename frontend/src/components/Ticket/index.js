@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Ticket = () => {
+const Ticket = ({ routeBase = "/tickets" }) => {
   const { ticketId } = useParams();
   const history = useHistory();
   const theme = useTheme();
@@ -104,7 +104,7 @@ const Ticket = () => {
             setLoading(false);
           }
         } catch (err) {
-          history.push("/tickets");   // correção para evitar tela branca uuid não encontrado Feito por Altemir 16/08/2023
+          history.push(routeBase);   // correção para evitar tela branca uuid não encontrado Feito por Altemir 16/08/2023
           setLoading(false);
           toastError(err);
         }
@@ -133,7 +133,7 @@ const Ticket = () => {
         }
 
         if (data.action === "delete" && data.ticketId === ticket?.id) {
-          history.push("/tickets");
+          history.push(routeBase);
         }
       };
 

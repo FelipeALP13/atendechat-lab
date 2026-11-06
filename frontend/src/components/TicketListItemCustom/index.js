@@ -231,7 +231,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const TicketListItemCustom = ({ setTabOpen, ticket }) => {
+const TicketListItemCustom = ({ setTabOpen, ticket, routeBase = "/tickets" }) => {
   const classes = useStyles();
   const theme = useTheme();
   const history = useHistory();
@@ -295,7 +295,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
       setFinalizacaoTipo("comDespedida");
       setOpenFinalizacaoVenda(true);
       handleSelectTicket(ticket);
-      history.push(`/tickets/${ticket.uuid}`);
+      history.push(`${routeBase}/${ticket.uuid}`);
     } else {
       // Comportamento original
       const setting = await getSetting({
@@ -320,7 +320,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
               setLoading(false);
             }
 
-            history.push(`/tickets/`);
+            history.push(`${routeBase}/`);
           }
         } catch (err) {
           setLoading(false);
@@ -341,7 +341,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
           setLoading(false);
         }
 
-        history.push(`/tickets/`);
+        history.push(`${routeBase}/`);
       }
     }
   };
@@ -363,7 +363,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
       setLoading(false);
     }
 
-    history.push(`/tickets/`);
+    history.push(`${routeBase}/`);
   };
 
   const truncate = (str, len) => {
@@ -388,7 +388,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
       setLoading(false);
     }
     handleSelectTicket(ticket);
-    history.push(`/tickets/${ticket.uuid}`);
+    history.push(`${routeBase}/${ticket.uuid}`);
   };
 
   const handleOpenNewTicketModal = () => {
@@ -400,7 +400,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
     if (newTicket) {
       // Se um novo ticket foi criado, redirecionar para ele
       handleSelectTicket(newTicket);
-      history.push(`/tickets/${newTicket.uuid}`);
+      history.push(`${routeBase}/${newTicket.uuid}`);
     }
   };
 
@@ -422,7 +422,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
           setLoading(false);
           setTabOpen(ticket.isGroup ? "group" : "open");
           handleSelectTicket(otherTicket.data);
-          history.push(`/tickets/${otherTicket.uuid}`);
+          history.push(`${routeBase}/${otherTicket.uuid}`);
         }
       } else {
         let setting;
@@ -447,7 +447,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
 
         setTabOpen(ticket.isGroup ? "group" : "open");
         handleSelectTicket(ticket);
-        history.push(`/tickets/${ticket.uuid}`);
+        history.push(`${routeBase}/${ticket.uuid}`);
       }
     } catch (err) {
       setLoading(false);
@@ -508,7 +508,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
         finalizacaoMessage,
       });
       toast.success("Ticket finalizado com sucesso!");
-      history.push(`/tickets/`);
+      history.push(`${routeBase}/`);
     } catch (err) {
       toastError(err);
     }
@@ -517,7 +517,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
   // Função para espionar ticket chatbot
   const handleSpyTicket = () => {
     handleSelectTicket(ticket);
-    history.push(`/tickets/${ticket.uuid}`);
+    history.push(`${routeBase}/${ticket.uuid}`);
   };
 
   // Lógica de permissão para mensagens pending - MOVIDA PARA DEPOIS DE TODAS AS FUNÇÕES
