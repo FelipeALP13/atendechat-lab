@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Runtime
+*.pid
+*.seed
+
+# Coverage
+coverage/
+
+# Temp
+tmp/
+temp/
+.cache/
+.yarn-cache-salushchat/
+.pnpm-store/
+
+# Local data and credentials
+*.sqlite
+*.sqlite3
+*.db
+*.pem
+*.key
+*.p12
+*.pfx
+sessions/
+storage/
+uploads/
+backend/private/

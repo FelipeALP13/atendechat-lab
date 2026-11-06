@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AtendeChat — Protótipo da nova central</title>
+  <style>
+    :root {
+      --brand: #6d39e8;
+      --brand-strong: #5520ca;
+      --brand-soft: #f1ecff;
+      --nav: #141529;
+      --nav-soft: #20223d;
+      --ink: #1e2330;
+      --muted: #687083;
+      --line: #e8eaf0;
+      --canvas: #f6f7fb;
+      --card: #ffffff;
+      --success: #1aa981;
+      --warning: #e5a21a;
+      --danger: #e0545f;
+      --shadow: 0 16px 44px rgba(28, 26, 52, .11);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 1040px;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--canvas);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 76px 322px minmax(470px, 1fr) 328px;
+      height: 100vh;
+    }
+
+    .rail {
+      background: linear-gradient(180deg, #17182e 0%, #111223 100%);
+      color: #aeb2cd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 10px;
+      gap: 8px;
+      border-right: 1px solid rgba(255,255,255,.06);
+    }
+    .logo {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: grid; place-items: center;
+      color: white; font-weight: 800; font-size: 20px;
+      background: linear-gradient(145deg, #8c5aff, #5b27d8);
+      box-shadow: 0 10px 24px rgba(109,57,232,.35);
+      margin-bottom: 14px;
+    }
+    .rail-btn {
+      width: 52px; height: 52px; border: 0; border-radius: 14px;
+      display: grid; place-items: center; gap: 2px;
+      background: transparent; color: inherit;
+      transition: .2s ease;
+      position: relative;
+    }
+    .rail-btn span { font-size: 10px; }
+    .rail-btn b { font-size: 18px; line-height: 1; }
+    .rail-btn:hover, .rail-btn.active { background: var(--nav-soft); color: #fff; }
+    .rail-btn.active::before {
+      content: ""; position: absolute; left: -10px; width: 3px; height: 26px;
+      border-radius: 0 6px 6px 0; background: #9b78ff;
+    }
+    .rail-spacer { flex: 1; }
+    .agent-avatar {
+      width: 38px; height: 38px; border-radius: 50%; background: #d9e9ff;
+      color: #285a9a; display: grid; place-items: center; font-weight: 800;
+      border: 3px solid #282a48; position: relative;
+    }
+    .agent-avatar::after {
+      content: ""; position: absolute; right: -1px; bottom: -1px;
+      width: 9px; height: 9px; border-radius: 50%; background: #35d6a4; border: 2px solid #17182e;
+    }
+
+    .inbox {
+      min-width: 0;
+      background: var(--card);
+      border-right: 1px solid var(--line);
+      display: flex; flex-direction: column;
+    }
+    .inbox-head { padding: 21px 20px 14px; border-bottom: 1px solid var(--line); }
+    .title-row { display: flex; align-items: center; justify-content: space-between; }
+    h1 { font-size: 21px; margin: 0; letter-spacing: -.4px; }
+    .mini-actions { display: flex; gap: 7px; }
+    .icon-btn {
+      width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 10px;
+      background: #fff; color: #565e70; display: grid; place-items: center;
+    }
+    .icon-btn:hover { border-color: #c7b9f5; color: var(--brand); background: #faf8ff; }
+    .search {
+      height: 40px; border-radius: 12px; background: #f4f5f8;
+      margin-top: 16px; display: flex; align-items: center; gap: 9px; padding: 0 12px;
+      color: #848b9a; border: 1px solid transparent;
+    }
+    .search:focus-within { background: #fff; border-color: #bfaef7; box-shadow: 0 0 0 3px #f1edff; }
+    .search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); }
+    .views { display: flex; gap: 8px; margin-top: 14px; overflow: hidden; }
+    .view {
+      border: 0; border-radius: 999px; padding: 7px 11px; white-space: nowrap;
+      background: #f3f4f7; color: #646c7d; font-size: 12px; font-weight: 700;
+    }
+    .view.active { color: var(--brand-strong); background: var(--brand-soft); }
+    .section-label {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px 8px; color: #8a91a0; font-size: 11px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+    .conversation-list { overflow: auto; padding: 0 9px 12px; }
+    .conv {
+      width: 100%; border: 0; text-align: left; background: #fff; border-radius: 14px;
+      padding: 12px 11px; display: grid; grid-template-columns: 44px 1fr auto;
+      gap: 10px; margin: 2px 0; color: inherit; transition: .16s ease;
+    }
+    .conv:hover { background: #f8f7fc; }
+    .conv.active { background: #f0ecfc; box-shadow: inset 3px 0 0 var(--brand); }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center;
+      color: #fff; font-weight: 800; font-size: 13px; position: relative;
+    }
+    .avatar::after { content:""; position:absolute; right:-1px; bottom:-1px; width:10px; height:10px; border-radius:50%; background:#31c99a; border:2px solid #fff; }
+    .a1 { background: linear-gradient(145deg,#ef8fa1,#d45775); }
+    .a2 { background: linear-gradient(145deg,#68b9ff,#3578ce); }
+    .a3 { background: linear-gradient(145deg,#ffbf64,#e68631); }
+    .a4 { background: linear-gradient(145deg,#5bd4bb,#27977f); }
+    .conv-main { min-width: 0; }
+    .conv-top { display: flex; align-items: center; gap: 6px; }
+    .conv-name { font-size: 13px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .channel { font-size: 10px; color: #fff; background: #23b275; padding: 2px 5px; border-radius: 5px; }
+    .preview { margin-top: 5px; color: #7a8190; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-side { display:flex; flex-direction:column; align-items:flex-end; gap:8px; font-size:10px; color:#9aa0ad; }
+    .unread { min-width: 19px; height: 19px; padding: 0 5px; display:grid; place-items:center; border-radius:10px; color:#fff; background:var(--brand); font-size:10px; font-weight:800; }
+    .sla { color: #c94350; background: #ffeaed; padding: 3px 6px; border-radius: 6px; font-weight: 800; }
+
+    .chat { min-width: 0; display: flex; flex-direction: column; background: #fbfbfd; }
+    .chat-head {
+      height: 77px; background: #fff; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+    }
+    .identity { display:flex; align-items:center; gap:12px; min-width:0; }
+    .identity-text h2 { margin:0; font-size:15px; }
+    .meta { margin-top:4px; display:flex; gap:7px; align-items:center; color:#7c8494; font-size:11px; }
+    .dot { width:5px; height:5px; background:#c1c5ce; border-radius:50%; }
+    .head-actions { display:flex; align-items:center; gap:8px; }
+    .pill-btn {
+      height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line);
+      background: #fff; color: #555d6d; font-size: 12px; font-weight: 750;
+    }
+    .pill-btn.primary { color:#fff; background:var(--brand); border-color:var(--brand); }
+    .pill-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(40,36,68,.09); }
+    .sla-chip { height:36px; padding:0 11px; display:flex; align-items:center; gap:7px; border-radius:10px; color:#9b5c00; background:#fff5dc; font-size:11px; font-weight:800; }
+    .presence {
+      padding: 7px 18px; background: #f5f2ff; color: #5f3ba7; border-bottom: 1px solid #e7defe;
+      font-size: 11px; display:flex; align-items:center; gap:8px;
+    }
+    .tiny-avatar { width:20px; height:20px; border-radius:50%; background:#c8b5ff; display:grid; place-items:center; font-size:9px; font-weight:800; }
+    .messages {
+      flex: 1; overflow:auto; padding: 24px max(25px, 6vw) 16px;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(109,57,232,.04), transparent 28%),
+        radial-gradient(circle at 80% 60%, rgba(36,178,117,.035), transparent 28%), #fafafe;
+    }
+    .day { text-align:center; margin: 0 0 18px; }
+    .day span { color:#7d8493; background:#eef0f4; border-radius:999px; padding:5px 10px; font-size:10px; font-weight:700; }
+    .msg-row { display:flex; margin: 10px 0; }
+    .msg-row.out { justify-content:flex-end; }
+    .bubble { max-width: 72%; border-radius: 15px; padding: 10px 12px 7px; font-size: 13px; line-height:1.45; box-shadow: 0 3px 12px rgba(34,36,58,.055); }
+    .in .bubble { background:#fff; border:1px solid #eceef3; border-top-left-radius:5px; }
+    .out .bubble { background:#ebe5ff; color:#302454; border-top-right-radius:5px; }
+    .note .bubble { background:#fff6d9; color:#614f18; border:1px dashed #e9cb66; max-width:84%; }
+    .msg-meta { display:flex; justify-content:flex-end; gap:5px; color:#9096a3; font-size:9px; margin-top:5px; }
+    .event { text-align:center; color:#969caa; font-size:10px; margin:16px 0; }
+    .event span { background:#f0f1f5; padding:5px 9px; border-radius:999px; }
+    .composer-wrap { background:#fff; border-top:1px solid var(--line); padding: 10px 17px 15px; }
+    .mode-tabs { display:flex; gap:6px; margin-bottom:8px; }
+    .mode {
+      border:0; background:transparent; color:#7d8492; padding:6px 9px; border-radius:7px;
+      font-size:11px; font-weight:800;
+    }
+    .mode.active { background:#eee9ff; color:var(--brand-strong); }
+    .mode.note-active { background:#fff1bb; color:#795f04; }
+    .composer {
+      min-height: 84px; border:1px solid #dfe2e9; border-radius:14px; padding:10px 11px;
+      display:flex; flex-direction:column; gap:8px; transition:.2s;
+    }
+    .composer:focus-within { border-color:#b4a0f3; box-shadow:0 0 0 3px #f0ecff; }
+    .composer.note-style { border-color:#e8cc69; background:#fffdf3; box-shadow:0 0 0 3px #fff7d8; }
+    textarea { resize:none; width:100%; flex:1; min-height:34px; border:0; outline:0; color:var(--ink); background:transparent; font-size:13px; }
+    .composer-bar { display:flex; align-items:center; justify-content:space-between; }
+    .tools { display:flex; gap:2px; }
+    .tool { width:29px; height:29px; border:0; border-radius:7px; background:transparent; color:#767e8d; }
+    .tool:hover { background:#f2f1f6; color:var(--brand); }
+    .send { height:31px; border:0; border-radius:9px; padding:0 13px; background:var(--brand); color:white; font-size:11px; font-weight:800; }
+
+    .context { background:#fff; border-left:1px solid var(--line); overflow:auto; }
+    .context-head { height:77px; padding:0 18px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+    .context-head strong { font-size:13px; }
+    .customer { text-align:center; padding:20px 18px 17px; border-bottom:1px solid var(--line); }
+    .big-avatar { width:66px; height:66px; border-radius:22px; margin:0 auto 10px; display:grid; place-items:center; color:#fff; font-size:20px; font-weight:800; background:linear-gradient(145deg,#ef8fa1,#d45775); box-shadow:0 10px 24px rgba(212,87,117,.2); }
+    .customer h3 { margin:0; font-size:15px; }
+    .customer p { margin:4px 0 0; color:#838a99; font-size:11px; }
+    .tags { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-top:12px; }
+    .tag { padding:4px 7px; border-radius:6px; font-size:9px; font-weight:800; background:#f1edff; color:#6840c6; }
+    .tag.gold { background:#fff1d5; color:#9a6500; }
+    .panel { padding:16px 17px; border-bottom:1px solid var(--line); }
+    .panel-title { display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:850; margin-bottom:12px; }
+    .link { border:0; background:transparent; color:var(--brand); font-size:10px; font-weight:800; }
+    .data-row { display:grid; grid-template-columns:88px 1fr; gap:7px; margin:9px 0; font-size:11px; }
+    .data-row span:first-child { color:#8b92a0; }
+    .data-row span:last-child { color:#3c4351; font-weight:650; text-align:right; overflow:hidden; text-overflow:ellipsis; }
+    .ai-card {
+      padding:14px; border-radius:14px; color:#4f3a87;
+      background:linear-gradient(135deg,#f1ecff,#f8f6ff); border:1px solid #dfd3ff;
+      position:relative; overflow:hidden;
+    }
+    .ai-card::after { content:"✦"; position:absolute; right:10px; top:5px; font-size:34px; color:rgba(109,57,232,.11); }
+    .ai-top { display:flex; align-items:center; gap:7px; font-size:11px; font-weight:900; }
+    .soon { padding:3px 6px; border-radius:6px; color:#7250c6; background:#e3d9ff; font-size:8px; text-transform:uppercase; letter-spacing:.06em; }
+    .ai-card p { margin:9px 0 10px; color:#75699a; font-size:10px; line-height:1.45; }
+    .ai-flow { display:flex; align-items:center; gap:5px; color:#5c4a87; font-size:9px; font-weight:800; }
+    .ai-node { padding:5px 7px; border-radius:7px; background:#fff; border:1px solid #ddd2f8; }
+    .ai-node.human { border-color:#bfe6d8; color:#167c60; background:#f3fffb; }
+    .ai-disabled { width:100%; margin-top:11px; height:31px; border-radius:8px; border:1px dashed #c7b5f5; background:rgba(255,255,255,.65); color:#8b76c0; font-size:10px; font-weight:800; cursor:not-allowed; }
+    .timeline { position:relative; margin-left:5px; }
+    .timeline::before { content:""; position:absolute; left:4px; top:5px; bottom:5px; width:1px; background:#e3e5eb; }
+    .t-item { position:relative; padding-left:19px; margin:10px 0; font-size:10px; color:#6f7787; line-height:1.35; }
+    .t-item::before { content:""; position:absolute; left:0; top:3px; width:8px; height:8px; border-radius:50%; background:#fff; border:2px solid #b3a0ec; }
+    .t-item strong { display:block; color:#3e4553; font-size:10px; }
+
+    .toast {
+      position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); opacity:0;
+      background:#1c1d2f; color:#fff; border-radius:12px; padding:11px 15px; font-size:11px;
+      box-shadow:var(--shadow); transition:.25s; pointer-events:none; z-index:10;
+    }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+
+    @media (max-width: 1240px) {
+      .app { grid-template-columns: 70px 290px minmax(440px,1fr) 292px; }
+      .messages { padding-left:35px; padding-right:35px; }
+      .head-actions .sla-chip { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <nav class="rail" aria-label="Navegação principal">
+      <div class="logo">a</div>
+      <button class="rail-btn active" title="Caixa de entrada"><b>◫</b><span>Inbox</span></button>
+      <button class="rail-btn" title="Contatos"><b>♙</b><span>CRM</span></button>
+      <button class="rail-btn" title="Automações"><b>⌁</b><span>Fluxos</span></button>
+      <button class="rail-btn" title="Campanhas"><b>◈</b><span>Camp.</span></button>
+      <button class="rail-btn" title="Relatórios"><b>▥</b><span>Dados</span></button>
+      <div class="rail-spacer"></div>
+      <button class="rail-btn" title="Configurações"><b>⚙</b><span>Config.</span></button>
+      <div class="agent-avatar" title="Carlos — Disponível">CA</div>
+    </nav>
+
+    <section class="inbox">
+      <header class="inbox-head">
+        <div class="title-row">
+          <h1>Conversas</h1>
+          <div class="mini-actions">
+            <button class="icon-btn" title="Filtros">≡</button>
+            <button class="icon-btn" title="Nova conversa">＋</button>
+          </div>
+        </div>
+        <label class="search">⌕<input id="search" type="search" placeholder="Buscar cliente ou conversa" /></label>
+        <div class="views">
+          <button class="view active">Minhas 8</button>
+          <button class="view">Não atribuídas 12</button>
+          <button class="view">N2 3</button>
+        </div>
+      </header>
+      <div class="section-label"><span>Prioridade</span><span>4 conversas</span></div>
+      <div class="conversation-list" id="conversationList">
+        <button class="conv active" data-name="Mariana Souza" data-initials="MS" data-company="Loja Aurora">
+          <div class="avatar a1">MS</div>
+          <div class="conv-main"><div class="conv-top"><span class="conv-name">Mariana Souza</span><span class="channel">WA</span></div><div class="preview">Preciso alterar o endereço do pedido…</div></div>
+          <div class="conv-side"><span>10:42</span><span class="sla">06:18</span></div>
+        </button>
+        <button class="conv" data-name="Rafael Mendes" data-initials="RM" data-company="Mendes & Filhos">
+          <div class="avatar a2">RM</div>
+          <div class="conv-main"><div class="conv-top"><span class="conv-name">Rafael Mendes</span><span class="channel">WA</span></div><div class="preview">Vocês emitem nota fiscal?</div></div>
+          <div class="conv-side"><span>10:37</span><span class="unread">2</span></div>
+        </button>
+        <button class="conv" data-name="Cláudia Lima" data-initials="CL" data-company="Cláudia Lima">
+          <div class="avatar a3">CL</div>
+          <div class="conv-main"><div class="conv-top"><span class="conv-name">Cláudia Lima</span><span class="channel">WA</span></div><div class="preview">Áudio • 0:42</div></div>
+          <div class="conv-side"><span>10:22</span><span class="unread">1</span></div>
+        </button>
+        <button class="conv" data-name="Henrique Alves" data-initials="HA" data-company="HA Serviços">
+          <div class="avatar a4">HA</div>
+          <div class="conv-main"><div class="conv-top"><span class="conv-name">Henrique Alves</span><span class="channel">WA</span></div><div class="preview">Obrigado pelo atendimento!</div></div>
+          <div class="conv-side"><span>09:58</span></div>
+        </button>
+
+        <div class="section-label" style="padding-left:7px;padding-right:4px"><span>Aguardando cliente</span><span>5</span></div>
+        <button class="conv" data-name="Bianca Martins" data-initials="BM" data-company="Studio BM">
+          <div class="avatar a2">BM</div>
+          <div class="conv-main"><div class="conv-top"><span class="conv-name">Bianca Martins</span><span class="channel">WA</span></div><div class="preview">Enviamos o orçamento solicitado.</div></div>
+          <div class="conv-side"><span>Ontem</span></div>
+        </button>
+        <button class="conv" data-name="Paulo Vieira" data-initials="PV" data-company="Vieira Autopeças">
+          <div class="avatar a4">PV</div>
+          <div class="conv-main"><div class="conv-top"><span class="conv-name">Paulo Vieira</span><span class="channel">WA</span></div><div class="preview">Posso ajudar com mais alguma coisa?</div></div>
+          <div class="conv-side"><span>Ontem</span></div>
+        </button>
+      </div>
+    </section>
+
+    <section class="chat">
+      <header class="chat-head">
+        <div class="identity">
+          <div class="avatar a1" id="headAvatar">MS</div>
+          <div class="identity-text"><h2 id="customerName">Mariana Souza</h2><div class="meta"><span>WhatsApp</span><span class="dot"></span><span id="companyName">Loja Aurora</span><span class="dot"></span><span style="color:#1a9e78">Online</span></div></div>
+        </div>
+        <div class="head-actions">
+          <div class="sla-chip">◷ SLA 06:18</div>
+          <button class="pill-btn">Comercial⌄</button>
+          <button class="pill-btn">Carlos⌄</button>
+          <button class="pill-btn primary" id="resolve">✓ Resolver</button>
+          <button class="icon-btn">•••</button>
+        </div>
+      </header>
+      <div class="presence"><span class="tiny-avatar">AN</span><strong>Ana</strong> também está visualizando esta conversa</div>
+      <div class="messages" id="messages">
+        <div class="day"><span>Hoje, 6 de novembro</span></div>
+        <div class="msg-row in"><div class="bubble">Olá! Fiz um pedido ontem, mas percebi que coloquei o endereço antigo. Ainda dá tempo de alterar?<div class="msg-meta">10:35</div></div></div>
+        <div class="msg-row out"><div class="bubble">Olá, Mariana! Vou verificar o status do seu pedido para você. Pode me confirmar o número, por favor?<div class="msg-meta">10:36 ✓✓</div></div></div>
+        <div class="msg-row in"><div class="bubble">Claro, é o pedido <strong>#48291</strong>.<div class="msg-meta">10:37</div></div></div>
+        <div class="event"><span>Atendimento atribuído a Carlos por distribuição automática</span></div>
+        <div class="msg-row note"><div class="bubble"><strong>Nota interna — Ana</strong><br />O pedido ainda não saiu para entrega. Podemos alterar no painel logístico.<div class="msg-meta">10:39</div></div></div>
+        <div class="msg-row in"><div class="bubble">O endereço correto é Rua das Flores, 245, ap. 32. Obrigada!<div class="msg-meta">10:42</div></div></div>
+      </div>
+      <div class="composer-wrap">
+        <div class="mode-tabs"><button class="mode active" id="replyMode">Responder</button><button class="mode" id="noteMode">Nota interna</button></div>
+        <div class="composer" id="composer">
+          <textarea id="messageInput" placeholder="Escreva uma resposta…"></textarea>
+          <div class="composer-bar">
+            <div class="tools"><button class="tool" title="Anexar">⌕</button><button class="tool" title="Emoji">☺</button><button class="tool" title="Resposta rápida">⌘</button><button class="tool" title="Gravar áudio">◉</button></div>
+            <button class="send" id="send">Enviar ↵</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="context">
+      <header class="context-head"><strong>Contexto do cliente</strong><button class="icon-btn">×</button></header>
+      <section class="customer">
+        <div class="big-avatar" id="bigAvatar">MS</div>
+        <h3 id="profileName">Mariana Souza</h3><p id="profileCompany">Loja Aurora • Cliente desde 2024</p>
+        <div class="tags"><span class="tag">Cliente recorrente</span><span class="tag gold">Prioridade</span><span class="tag">E-commerce</span></div>
+      </section>
+      <section class="panel">
+        <div class="panel-title"><span>Informações</span><button class="link">Editar</button></div>
+        <div class="data-row"><span>Telefone</span><span>+55 11 99999-2814</span></div>
+        <div class="data-row"><span>E-mail</span><span>mariana@aurora.com</span></div>
+        <div class="data-row"><span>Responsável</span><span>Carlos Almeida</span></div>
+        <div class="data-row"><span>Último pedido</span><span>#48291 • R$ 328,40</span></div>
+      </section>
+      <section class="panel">
+        <div class="ai-card">
+          <div class="ai-top">✦ Assistente N1 <span class="soon">Futuro</span></div>
+          <p>Espaço reservado para responder dúvidas simples com base no conhecimento da empresa e transferir, com todo o contexto, quando não souber resolver.</p>
+          <div class="ai-flow"><span class="ai-node">Cliente</span><span>→</span><span class="ai-node">IA N1</span><span>→</span><span class="ai-node human">Equipe N2</span></div>
+          <button class="ai-disabled" disabled>Integração ainda não ativada</button>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-title"><span>Histórico recente</span><button class="link">Ver tudo</button></div>
+        <div class="timeline">
+          <div class="t-item"><strong>Pedido #48291</strong>Pagamento aprovado • ontem</div>
+          <div class="t-item"><strong>Atendimento resolvido</strong>Dúvida sobre prazo de entrega • 18 out</div>
+          <div class="t-item"><strong>CSAT 5 de 5</strong>“Atendimento muito rápido” • 18 out</div>
+        </div>
+      </section>
+    </aside>
+  </main>
+  <div class="toast" id="toast">Ação concluída</div>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const toast = (message) => {
+      const el = $('#toast'); el.textContent = message; el.classList.add('show');
+      clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => el.classList.remove('show'), 2100);
+    };
+
+    let noteMode = false;
+    $('#replyMode').addEventListener('click', () => setMode(false));
+    $('#noteMode').addEventListener('click', () => setMode(true));
+    function setMode(note) {
+      noteMode = note;
+      $('#replyMode').className = 'mode' + (!note ? ' active' : '');
+      $('#noteMode').className = 'mode' + (note ? ' note-active' : '');
+      $('#composer').classList.toggle('note-style', note);
+      $('#messageInput').placeholder = note ? 'Escreva uma nota visível somente para a equipe…' : 'Escreva uma resposta…';
+      $('#send').textContent = note ? 'Adicionar nota' : 'Enviar ↵';
+      $('#messageInput').focus();
+    }
+
+    function sendMessage() {
+      const input = $('#messageInput'); const value = input.value.trim();
+      if (!value) { toast('Digite uma mensagem primeiro'); return; }
+      const row = document.createElement('div');
+      row.className = 'msg-row ' + (noteMode ? 'note' : 'out');
+      const safe = value.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+      row.innerHTML = `<div class="bubble">${noteMode ? '<strong>Nota interna — Carlos</strong><br />' : ''}${safe}<div class="msg-meta">agora${noteMode ? '' : ' ✓'}</div></div>`;
+      $('#messages').appendChild(row); input.value = ''; $('#messages').scrollTop = $('#messages').scrollHeight;
+      toast(noteMode ? 'Nota interna adicionada' : 'Mensagem adicionada ao protótipo');
+    }
+    $('#send').addEventListener('click', sendMessage);
+    $('#messageInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+
+    document.querySelectorAll('.conv').forEach(item => item.addEventListener('click', () => {
+      document.querySelectorAll('.conv').forEach(x => x.classList.remove('active')); item.classList.add('active');
+      const name = item.dataset.name, initials = item.dataset.initials, company = item.dataset.company;
+      $('#customerName').textContent = name; $('#profileName').textContent = name;
+      $('#headAvatar').textContent = initials; $('#bigAvatar').textContent = initials;
+      $('#companyName').textContent = company; $('#profileCompany').textContent = company + ' • Cliente desde 2024';
+      toast('Visualizando conversa de ' + name);
+    }));
+    $('#resolve').addEventListener('click', () => toast('Protótipo: atendimento marcado como resolvido'));
+    $('#search').addEventListener('input', e => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.conv').forEach(item => item.style.display = item.dataset.name.toLowerCase().includes(term) ? 'grid' : 'none');
+    });
+    document.querySelectorAll('.view, .rail-btn, .icon-btn, .pill-btn, .link').forEach(btn => btn.addEventListener('click', () => {
+      if (!btn.id && !btn.closest('.chat-head')) toast('Elemento demonstrativo do protótipo');
+    }));
+  </script>
+</body>
+</html>

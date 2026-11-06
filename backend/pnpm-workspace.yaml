@@ -1,0 +1,6 @@
+packages:
+  - "."
+
+allowBuilds:
+  "baileys@https://codeload.github.com/renatoiub/WSocket/tar.gz/21ae0d7d560de58e8edf5b3930a99cab50c10cb4": true
+  "libsignal@https://codeload.github.com/renatoiub/libsignal-node/tar.gz/4d08331a833727c338c1a90041d17b870210dfae": true

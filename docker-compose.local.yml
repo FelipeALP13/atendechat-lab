@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: salushchat-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: salushchat
+      POSTGRES_USER: salushchat
+      POSTGRES_PASSWORD: salushchat_local_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - salushchat_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U salushchat -d salushchat"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: salushchat-redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "salushchat_redis_local"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - salushchat_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "salushchat_redis_local", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  salushchat_postgres_data:
+  salushchat_redis_data:
