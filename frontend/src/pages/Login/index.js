@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => {
         boxSizing: "border-box",
         overflow: "hidden",
         position: "relative",
-        backgroundColor: theme.palette.background ? theme.palette.background.default : (theme.palette.type === "light" ? "#f5f5f5" : "#303030"),
+        backgroundColor: theme.palette.type === "light" ? "#f8f7fc" : "#11131f",
         backgroundImage: "none",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
@@ -78,19 +78,23 @@ const useStyles = makeStyles((theme) => {
     },
 
     containerLogin: {
-        padding: "16px",
-        width: "calc(100% - 32px)",
+        padding: "32px",
+        width: "44%",
         zIndex: 10,
-        left: "50%",
+        left: "auto",
+        right: 0,
         top: "50%",
-        transform: "translate(-50%, -50%)",
+        transform: "translateY(-50%)",
         position: "absolute",
-        maxWidth: "420px",
-        margin: "0 auto",
+        maxWidth: "560px",
+        margin: 0,
 
         [theme.breakpoints.down("sm")]: {
             width: "calc(100% - 40px)",
-            maxWidth: "90%",
+            maxWidth: "460px",
+            left: "50%",
+            right: "auto",
+            transform: "translate(-50%, -50%)",
         },
         
         [theme.breakpoints.down("xs")]: {
@@ -100,23 +104,23 @@ const useStyles = makeStyles((theme) => {
     },
 
     paper: {
-        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        backgroundColor: theme.palette.background.paper,
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         boxShadow: `
-      0 20px 40px rgba(0, 0, 0, 0.1),
+      0 24px 70px rgba(38, 31, 71, 0.12),
       0 1px 0 rgba(255, 255, 255, 0.2) inset,
       0 0 0 1px rgba(255, 255, 255, 0.1)
     `,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        padding: "40px 30px",
-        borderRadius: "20px",
+        padding: "42px 38px 34px",
+        borderRadius: "24px",
         maxWidth: "420px",
         width: "100%",
         margin: "0 auto",
-        border: "1px solid rgba(255, 255, 255, 0.2)",
+        border: `1px solid ${theme.palette.divider}`,
         animation: "$slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
         position: "relative",
         boxSizing: "border-box",
@@ -202,7 +206,7 @@ const useStyles = makeStyles((theme) => {
 
     logoImg: {
         width: "100%",
-        maxWidth: "280px",
+        maxWidth: "230px",
         height: "auto",
         maxHeight: "80px",
         margin: "0 auto 20px auto",
@@ -216,7 +220,7 @@ const useStyles = makeStyles((theme) => {
         position: "absolute",
         top: 15,
         right: 15,
-        background: "rgba(255, 255, 255, 0.1)",
+        background: theme.palette.type === "light" ? "#f3f1f8" : "#20222d",
         backdropFilter: "blur(10px)",
         border: "1px solid rgba(255, 255, 255, 0.2)",
         color: "#374151",
@@ -230,7 +234,7 @@ const useStyles = makeStyles((theme) => {
     textField: {
         "& .MuiOutlinedInput-root": {
             borderRadius: "12px",
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            backgroundColor: theme.palette.type === "light" ? "#fbfafe" : "#20222d",
             backdropFilter: "blur(10px)",
             transition: "all 0.3s ease",
             "&:hover": {
@@ -238,16 +242,16 @@ const useStyles = makeStyles((theme) => {
             },
             "&.Mui-focused": {
                 backgroundColor: "rgba(255, 255, 255, 1)",
-                boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
+                boxShadow: "0 0 0 3px rgba(109, 57, 232, 0.10)",
             },
             "& fieldset": {
-                borderColor: "rgba(59, 130, 246, 0.2)",
+                borderColor: "rgba(109, 57, 232, 0.18)",
             },
             "&:hover fieldset": {
                 borderColor: "rgba(59, 130, 246, 0.4)",
             },
             "&.Mui-focused fieldset": {
-                borderColor: "#3b82f6",
+                borderColor: "#6d39e8",
                 borderWidth: "2px",
             },
         },
@@ -255,7 +259,7 @@ const useStyles = makeStyles((theme) => {
             color: "#6b7280",
             fontWeight: 500,
             "&.Mui-focused": {
-                color: "#3b82f6",
+                color: "#6d39e8",
             },
         },
     },
@@ -270,6 +274,11 @@ const useStyles = makeStyles((theme) => {
         borderRadius: "12px",
         border: "1px solid rgba(255, 255, 255, 0.2)",
         padding: "8px 12px",
+        [theme.breakpoints.down("sm")]: {
+            background: theme.palette.type === "light" ? "#fff" : "#20222d",
+            borderColor: theme.palette.divider,
+            "& button": { color: theme.palette.text.primary },
+        },
     },
 
     registerLink: {
@@ -359,6 +368,90 @@ const useStyles = makeStyles((theme) => {
         "&:hover": {
             opacity: 1,
         },
+    },
+    brandPanel: {
+        position: "absolute",
+        inset: "0 44% 0 0",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        padding: "clamp(48px, 7vw, 110px)",
+        color: "#fff",
+        textAlign: "left",
+        background: "linear-gradient(145deg, #7b4df0 0%, #5c2ac7 52%, #361278 100%)",
+        "&:before": {
+            content: '""',
+            position: "absolute",
+            width: 460,
+            height: 460,
+            top: -210,
+            right: -120,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,.09)",
+        },
+        "&:after": {
+            content: '""',
+            position: "absolute",
+            width: 300,
+            height: 300,
+            bottom: -170,
+            left: -90,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,.07)",
+        },
+        [theme.breakpoints.down("sm")]: { display: "none" },
+    },
+    brandContent: { position: "relative", zIndex: 1, maxWidth: 590 },
+    brandPill: {
+        display: "inline-flex",
+        padding: "7px 11px",
+        marginBottom: 22,
+        border: "1px solid rgba(255,255,255,.20)",
+        borderRadius: 999,
+        background: "rgba(255,255,255,.10)",
+        fontSize: 10,
+        fontWeight: 900,
+        letterSpacing: ".10em",
+        textTransform: "uppercase",
+    },
+    brandTitle: {
+        margin: 0,
+        maxWidth: 560,
+        fontSize: "clamp(34px, 4vw, 58px)",
+        fontWeight: 900,
+        lineHeight: 1.02,
+        letterSpacing: "-.045em",
+    },
+    brandDescription: {
+        maxWidth: 510,
+        marginTop: 22,
+        color: "rgba(255,255,255,.72)",
+        fontSize: 15,
+        lineHeight: 1.65,
+    },
+    brandFeatures: {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 10,
+        marginTop: 30,
+        "& span": {
+            padding: "8px 11px",
+            borderRadius: 10,
+            background: "rgba(255,255,255,.10)",
+            fontSize: 11,
+            fontWeight: 700,
+        },
+    },
+    loginHeading: {
+        marginTop: 2,
+        fontSize: 21,
+        fontWeight: 900,
+        letterSpacing: "-.025em",
+    },
+    loginSubtitle: {
+        margin: "7px 0 14px",
+        color: theme.palette.text.secondary,
+        fontSize: 12,
     },
 })});
 
@@ -510,6 +603,23 @@ const Login = () => {
                         : "none"
                 }}
             >
+                <aside className={classes.brandPanel} aria-label="Apresentação do AtendeChat">
+                    <div className={classes.brandContent}>
+                        <span className={classes.brandPill}>Atendimento omnichannel</span>
+                        <h1 className={classes.brandTitle}>
+                            Conversas melhores. Equipes mais produtivas.
+                        </h1>
+                        <p className={classes.brandDescription}>
+                            Centralize clientes, canais, automações e indicadores em uma experiência criada para operações de atendimento modernas.
+                        </p>
+                        <div className={classes.brandFeatures}>
+                            <span>WhatsApp e redes sociais</span>
+                            <span>Filas e automações</span>
+                            <span>Gestão em tempo real</span>
+                        </div>
+                    </div>
+                </aside>
+
                 {/* Seletor de idioma */}
                 <div
                     ref={ref}
@@ -554,15 +664,6 @@ const Login = () => {
                     component="main"
                     maxWidth={false}
                     className={classes.containerLogin}
-                    style={{ 
-                        zIndex: 10, 
-                        position: "absolute", 
-                        left: "50%", 
-                        top: "50%", 
-                        transform: "translate(-50%, -50%)",
-                        boxSizing: "border-box",
-                        margin: "0 auto"
-                    }}
                 >
                     <CssBaseline />
                     <div className={classes.paper}>
@@ -576,6 +677,10 @@ const Login = () => {
                         <div>
                             <img className={classes.logoImg} alt="logo" />
                         </div>
+                        <Typography className={classes.loginHeading}>Bem-vindo de volta</Typography>
+                        <Typography className={classes.loginSubtitle}>
+                            Entre com seus dados para acessar sua central.
+                        </Typography>
 
                         <form className={classes.form} noValidate onSubmit={handlSubmit}>
                             <TextField
