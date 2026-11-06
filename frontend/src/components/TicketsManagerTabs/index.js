@@ -390,6 +390,7 @@ const useStyles = makeStyles((theme) => ({
     border: "0 !important",
     borderRadius: "0 !important",
     background: theme.palette.background.paper,
+    color: theme.palette.text.primary,
   },
   modernHeader: {
     display: "flex",
@@ -440,6 +441,14 @@ const useStyles = makeStyles((theme) => ({
       height: 32,
       flex: "0 0 auto",
       padding: 5,
+      color: theme.palette.type === "dark" ? "#d7d3e1" : "#5f5a6b",
+    },
+    "& .MuiInputBase-input": {
+      color: theme.palette.text.primary,
+      "&::placeholder": {
+        color: theme.palette.type === "dark" ? "#b7b2c2" : "#716b7d",
+        opacity: 1,
+      },
     },
     "&:focus-within": {
       borderColor: theme.palette.primary.light,
@@ -465,6 +474,25 @@ const useStyles = makeStyles((theme) => ({
     "& .MuiBadge-root": { flex: "0 0 auto" },
     "& .MuiIconButton-root, & .MuiToggleButton-root": {
       marginRight: "5px !important",
+      color: theme.palette.type === "dark" ? "#d7d3e1" : "#5f5a6b",
+      borderColor: theme.palette.type === "dark" ? "#686374" : "#d5cfdf",
+      background: theme.palette.type === "dark" ? "#2b2d39" : "#ffffff",
+      "&:hover": {
+        color: theme.palette.type === "dark" ? "#d6c8ff" : "#6030cf",
+        borderColor: theme.palette.type === "dark" ? "#9a7de9" : "#8b64e8",
+        background: theme.palette.type === "dark" ? "#343044" : "#f2edff",
+      },
+    },
+    "& .MuiSvgIcon-root": {
+      color: "inherit !important",
+    },
+    "& [class*='activeButton']": {
+      color: theme.palette.type === "dark" ? "#d6c8ff" : "#6030cf",
+      borderColor: theme.palette.type === "dark" ? "#9a7de9" : "#7b4be2",
+      background: theme.palette.type === "dark" ? "#343044" : "#eee8ff",
+    },
+    "& .MuiSelect-root, & .MuiInputBase-root": {
+      color: theme.palette.text.primary,
     },
   },
   modernTabsV2: {
@@ -473,6 +501,15 @@ const useStyles = makeStyles((theme) => ({
     padding: 3,
     borderRadius: 12,
     background: theme.palette.type === "dark" ? "#20222d" : "#f3f4f8",
+    "& .MuiTab-root": {
+      color: theme.palette.type === "dark" ? "#aaa5b5" : "#686272",
+      opacity: 1,
+    },
+    "& .MuiTab-textColorPrimary.Mui-selected": {
+      color: theme.palette.type === "dark" ? "#cbbcff" : "#6030cf",
+      background: theme.palette.type === "dark" ? "#2e2a40" : "#ffffff",
+    },
+    "& .MuiSvgIcon-root": { color: "inherit !important" },
   },
 }));
 

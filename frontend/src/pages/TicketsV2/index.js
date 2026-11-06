@@ -71,6 +71,7 @@ const useStyles = makeStyles(theme => ({
     gap: theme.spacing(2),
     borderBottom: `1px solid ${theme.palette.divider}`,
     background: theme.palette.background.paper,
+    color: theme.palette.text.primary,
   },
   titleGroup: {
     display: "flex",
@@ -89,6 +90,7 @@ const useStyles = makeStyles(theme => ({
     boxShadow: "0 8px 20px rgba(109, 57, 232, .24)",
   },
   title: {
+    color: theme.palette.text.primary,
     fontSize: 14,
     fontWeight: 800,
     lineHeight: 1.1,
@@ -209,6 +211,15 @@ const useStyles = makeStyles(theme => ({
       theme.palette.type === "dark"
         ? "radial-gradient(circle at 50% 35%, rgba(109,57,232,.16), transparent 36%)"
         : "radial-gradient(circle at 50% 35%, rgba(109,57,232,.09), transparent 36%)",
+  },
+  emptyTitle: {
+    color: theme.palette.type === "dark" ? "#f4f1fa" : theme.palette.text.primary,
+    fontWeight: 900,
+    letterSpacing: "-.02em",
+  },
+  emptyCopy: {
+    marginTop: 5,
+    color: theme.palette.type === "dark" ? "#c4bfce" : theme.palette.text.secondary,
   },
   emptyIcon: {
     width: 64,
@@ -760,8 +771,8 @@ const TicketsV2 = () => {
               ) : (
                 <div className={classes.empty}>
                   <span className={classes.emptyIcon}><ForumOutlined fontSize="large" /></span>
-                  <Typography variant="h6">Selecione um atendimento</Typography>
-                  <Typography color="textSecondary" variant="body2">
+                  <Typography className={classes.emptyTitle} variant="h6">Selecione um atendimento</Typography>
+                  <Typography className={classes.emptyCopy} variant="body2">
                     A conversa será aberta aqui sem perder sua posição na fila.
                   </Typography>
                   <div className={classes.emptyGuide}>

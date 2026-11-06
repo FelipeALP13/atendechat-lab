@@ -85,6 +85,12 @@ const useStyles = makeStyles((theme) => ({
         border: `1px dashed ${theme.palette.divider}`,
         borderRadius: 16,
         background: theme.palette.type === "dark" ? "rgba(255,255,255,.02)" : "#fbfaff",
+        "& $noTicketsTitle": {
+            color: theme.palette.type === "dark" ? "#f4f1fa" : theme.palette.text.primary,
+        },
+        "& $noTicketsText": {
+            color: theme.palette.type === "dark" ? "#b9b4c4" : "#686272",
+        },
     },
     modernEmptyIcon: {
         width: 42,
