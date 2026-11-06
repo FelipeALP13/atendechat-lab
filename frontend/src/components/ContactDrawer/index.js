@@ -411,7 +411,14 @@ function TabPanel(props) {
 	);
 }
 
-const ContactDrawer = ({ open, handleDrawerClose, contact, ticket, loading }) => {
+const ContactDrawer = ({
+	open,
+	handleDrawerClose,
+	contact,
+	ticket,
+	loading,
+	routeBase = "/tickets",
+}) => {
 	const classes = useStyles();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -774,7 +781,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, ticket, loading }) =>
   const handleTicketCreated = (ticket) => {
     setNewTicketModalOpen(false);
     if (ticket && (ticket.uuid || ticket.id)) {
-      const target = ticket.uuid ? `/tickets/${ticket.uuid}` : `/tickets/${ticket.id}`;
+      const target = ticket.uuid ? `${routeBase}/${ticket.uuid}` : `${routeBase}/${ticket.id}`;
       history.push(target);
     }
   };

@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Ticket = ({ routeBase = "/tickets" }) => {
+const Ticket = ({ routeBase = "/tickets", onTicketContextChange }) => {
   const { ticketId } = useParams();
   const history = useHistory();
   const theme = useTheme();
@@ -83,6 +83,12 @@ const Ticket = ({ routeBase = "/tickets" }) => {
   const [ticket, setTicket] = useState({});
   const [dragDropFiles, setDragDropFiles] = useState([]);
   const { companyId } = user;
+
+  useEffect(() => {
+    if (typeof onTicketContextChange === "function") {
+      onTicketContextChange({ contact, ticket, loading });
+    }
+  }, [contact, ticket, loading, onTicketContextChange]);
 
   useEffect(() => {
     setLoading(true);
@@ -262,6 +268,7 @@ const Ticket = ({ routeBase = "/tickets" }) => {
         contact={contact}
         loading={loading}
         ticket={ticket}
+        routeBase={routeBase}
       />
 
     </div>

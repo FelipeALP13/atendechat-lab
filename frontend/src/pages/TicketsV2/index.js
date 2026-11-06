@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
+import clsx from "clsx";
 import {
+  Avatar,
   Button,
   Chip,
+  Divider,
+  Drawer,
+  IconButton,
   Paper,
   Tooltip,
   Typography,
@@ -12,10 +17,17 @@ import {
 } from "@material-ui/core";
 import {
   ArrowBack,
+  AssignmentIndOutlined,
   CheckCircleOutline,
+  Close,
+  EmailOutlined,
   ForumOutlined,
+  InfoOutlined,
+  LabelOutlined,
   LockOutlined,
+  PersonOutline,
   RecordVoiceOverOutlined,
+  Schedule,
   TrendingUp,
 } from "@material-ui/icons";
 
@@ -123,8 +135,8 @@ const useStyles = makeStyles(theme => ({
       gridTemplateColumns: "minmax(300px, 342px) minmax(470px, 1fr)",
     },
     [theme.breakpoints.down("sm")]: {
-      gridTemplateColumns: "minmax(280px, 38%) minmax(420px, 1fr)",
-      overflowX: "auto",
+      gridTemplateColumns: "minmax(0, 1fr)",
+      overflow: "hidden",
     },
   },
   inbox: {
@@ -182,6 +194,118 @@ const useStyles = makeStyles(theme => ({
     borderLeft: `1px solid ${theme.palette.divider}`,
     background: theme.palette.background.paper,
     [theme.breakpoints.down(1450)]: { display: "none" },
+  },
+  compactInboxHidden: {
+    [theme.breakpoints.down("sm")]: { display: "none" },
+  },
+  compactConversationHidden: {
+    [theme.breakpoints.down("sm")]: { display: "none" },
+  },
+  contextToolbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: theme.spacing(1),
+  },
+  contextClose: {
+    display: "none",
+  },
+  drawerPaper: {
+    width: 320,
+    maxWidth: "92vw",
+    padding: theme.spacing(1.5),
+    background: theme.palette.background.paper,
+  },
+  detailsButton: {
+    borderRadius: 9,
+    textTransform: "none",
+    fontSize: 11,
+    fontWeight: 700,
+  },
+  customerCard: {
+    padding: theme.spacing(1.75),
+    marginBottom: theme.spacing(1.5),
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 14,
+    textAlign: "center",
+    background: theme.palette.background.paper,
+  },
+  customerAvatar: {
+    width: 58,
+    height: 58,
+    margin: "0 auto 10px",
+    color: "#fff",
+    fontWeight: 900,
+    background: "linear-gradient(145deg, #ef8fa1, #cf5575)",
+    boxShadow: "0 10px 22px rgba(207, 85, 117, .18)",
+  },
+  customerName: {
+    fontSize: 14,
+    fontWeight: 900,
+  },
+  customerMeta: {
+    marginTop: 3,
+    color: theme.palette.text.secondary,
+    fontSize: 10.5,
+  },
+  tags: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 5,
+    marginTop: theme.spacing(1.25),
+  },
+  contactTag: {
+    height: 22,
+    fontSize: 9,
+    fontWeight: 800,
+  },
+  detailsCard: {
+    marginBottom: theme.spacing(1.5),
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 14,
+    overflow: "hidden",
+    background: theme.palette.background.paper,
+  },
+  detailRow: {
+    display: "grid",
+    gridTemplateColumns: "27px minmax(72px, auto) 1fr",
+    alignItems: "center",
+    gap: 7,
+    minHeight: 38,
+    padding: theme.spacing(0.5, 1.25),
+    color: theme.palette.text.secondary,
+    fontSize: 10.5,
+    "& svg": { color: theme.palette.primary.main, fontSize: 16 },
+    "& strong": {
+      color: theme.palette.text.primary,
+      fontSize: 10.5,
+      fontWeight: 800,
+      textAlign: "right",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
+  },
+  contextEmpty: {
+    padding: theme.spacing(2),
+    marginBottom: theme.spacing(1.5),
+    color: theme.palette.text.secondary,
+    border: `1px dashed ${theme.palette.divider}`,
+    borderRadius: 14,
+    textAlign: "center",
+    fontSize: 11,
+  },
+  keyboardHint: {
+    marginLeft: 5,
+    padding: "2px 6px",
+    color: theme.palette.text.secondary,
+    border: `1px solid ${theme.palette.divider}`,
+    borderBottomWidth: 2,
+    borderRadius: 5,
+    background: theme.palette.background.default,
+    fontSize: 9,
+    fontWeight: 800,
   },
   sectionTitle: {
     margin: theme.spacing(0.5, 0, 1.25),
@@ -291,11 +415,111 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AiN1Placeholder = () => {
-  const classes = useStyles();
+const statusLabels = {
+  open: "Em atendimento",
+  pending: "Aguardando",
+  closed: "Resolvido",
+  group: "Grupo",
+  chatbot: "Chatbot",
+};
 
-  return (
-    <aside className={classes.context} aria-label="Recursos futuros do atendimento">
+const CustomerContext = ({ context, drawer = false, onClose }) => {
+  const classes = useStyles();
+  const contact = context.contact || {};
+  const ticket = context.ticket || {};
+  const hasTicket = Boolean(ticket.id || contact.id);
+  const contactTags = Array.isArray(contact.tags) ? contact.tags.slice(0, 5) : [];
+  const initials = (contact.name || "Cliente")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part.charAt(0).toUpperCase())
+    .join("");
+
+  const content = (
+    <>
+      <div className={classes.contextToolbar}>
+        <div className={classes.sectionTitle} style={{ margin: 0 }}>
+          Contexto do cliente
+        </div>
+        {drawer && (
+          <IconButton aria-label="Fechar detalhes" onClick={onClose} size="small">
+            <Close fontSize="small" />
+          </IconButton>
+        )}
+      </div>
+
+      {hasTicket ? (
+        <>
+          <div className={classes.customerCard}>
+            <Avatar
+              alt={contact.name || "Cliente"}
+              className={classes.customerAvatar}
+              src={contact.urlPicture}
+            >
+              {initials}
+            </Avatar>
+            <div className={classes.customerName}>{contact.name || "Contato sem nome"}</div>
+            <div className={classes.customerMeta}>
+              Ticket #{ticket.id || "—"} • {ticket.channel || "Canal não informado"}
+            </div>
+            {contactTags.length > 0 && (
+              <div className={classes.tags}>
+                {contactTags.map(tag => (
+                  <Chip
+                    className={classes.contactTag}
+                    key={tag.id || tag.name}
+                    label={tag.name}
+                    size="small"
+                    style={tag.color ? { borderColor: tag.color, color: tag.color } : undefined}
+                    variant="outlined"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className={classes.detailsCard}>
+            <div className={classes.detailRow}>
+              <AssignmentIndOutlined /> <span>Status</span>
+              <strong>{statusLabels[ticket.status] || ticket.status || "—"}</strong>
+            </div>
+            <Divider />
+            <div className={classes.detailRow}>
+              <LabelOutlined /> <span>Fila</span>
+              <strong>{ticket.queue?.name || "Sem fila"}</strong>
+            </div>
+            <Divider />
+            <div className={classes.detailRow}>
+              <PersonOutline /> <span>Responsável</span>
+              <strong>{ticket.user?.name || "Não atribuído"}</strong>
+            </div>
+            {contact.email && (
+              <>
+                <Divider />
+                <div className={classes.detailRow}>
+                  <EmailOutlined /> <span>E-mail</span>
+                  <strong title={contact.email}>{contact.email}</strong>
+                </div>
+              </>
+            )}
+            {ticket.createdAt && (
+              <>
+                <Divider />
+                <div className={classes.detailRow}>
+                  <Schedule /> <span>Iniciado em</span>
+                  <strong>{new Date(ticket.createdAt).toLocaleDateString("pt-BR")}</strong>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <div className={classes.contextEmpty}>
+          Selecione um atendimento para visualizar cliente, fila, responsável e etiquetas.
+        </div>
+      )}
+
       <div className={classes.sectionTitle}>Evolução do atendimento</div>
       <div className={classes.aiCard}>
         <div className={classes.aiHead}>
@@ -306,7 +530,7 @@ const AiN1Placeholder = () => {
         <div className={classes.aiCopy}>
           Estrutura reservada para uma IA responder dúvidas simples usando a
           base da empresa. Quando não houver resposta segura, ela encaminhará
-          o atendimento completo para uma equipe humana N2.
+          a conversa e o contexto para uma equipe humana N2.
         </div>
         <div className={classes.aiFlow} aria-label="Cliente para IA N1 e equipe N2">
           <span className={classes.flowNode}>Cliente</span>
@@ -343,10 +567,18 @@ const AiN1Placeholder = () => {
       <div className={classes.metricCard}>
         <span className={classes.metricIcon}><TrendingUp fontSize="small" /></span>
         <span>
-          <strong style={{ display: "block", marginBottom: 3 }}>Próxima etapa</strong>
-          Contexto unificado do cliente, SLA e presença de atendentes.
+          <strong style={{ display: "block", marginBottom: 3 }}>Próxima evolução</strong>
+          SLA configurável e presença colaborativa dos atendentes.
         </span>
       </div>
+    </>
+  );
+
+  return drawer ? (
+    <div>{content}</div>
+  ) : (
+    <aside className={classes.context} aria-label="Contexto do atendimento">
+      {content}
     </aside>
   );
 };
@@ -357,6 +589,43 @@ const TicketsV2 = () => {
   const { ticketId } = useParams();
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+  const contextInline = useMediaQuery("(min-width:1451px)");
+  const [contextDrawerOpen, setContextDrawerOpen] = useState(false);
+  const [ticketContext, setTicketContext] = useState({
+    contact: {},
+    ticket: {},
+    loading: false,
+  });
+
+  const handleTicketContextChange = useCallback(nextContext => {
+    setTicketContext(nextContext);
+  }, []);
+
+  useEffect(() => {
+    if (!ticketId) {
+      setTicketContext({ contact: {}, ticket: {}, loading: false });
+      setContextDrawerOpen(false);
+    }
+  }, [ticketId]);
+
+  useEffect(() => {
+    const handleKeyboardNavigation = event => {
+      const element = event.target;
+      const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(element?.tagName);
+
+      if (event.key === "Escape" && ticketId && !isTyping) {
+        history.push(V2_ROUTE);
+      }
+
+      if (event.altKey && event.key.toLowerCase() === "i" && !contextInline) {
+        event.preventDefault();
+        setContextDrawerOpen(current => !current);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyboardNavigation);
+    return () => window.removeEventListener("keydown", handleKeyboardNavigation);
+  }, [contextInline, history, ticketId]);
 
   return (
     <QueueSelectedProvider>
@@ -375,6 +644,32 @@ const TicketsV2 = () => {
               <span className={classes.preserved}>
                 <CheckCircleOutline fontSize="small" /> Funcionalidades preservadas
               </span>
+              {!contextInline && ticketId && (
+                <Tooltip title="Abrir contexto do cliente (Alt + I)">
+                  <Button
+                    className={classes.detailsButton}
+                    onClick={() => setContextDrawerOpen(true)}
+                    size="small"
+                    startIcon={<InfoOutlined />}
+                    variant="outlined"
+                  >
+                    Detalhes <span className={classes.keyboardHint}>Alt I</span>
+                  </Button>
+                </Tooltip>
+              )}
+              {isSmall && ticketId && (
+                <Tooltip title="Voltar para a lista de atendimentos">
+                  <Button
+                    className={classes.classicButton}
+                    onClick={() => history.push(V2_ROUTE)}
+                    size="small"
+                    startIcon={<ArrowBack />}
+                    variant="outlined"
+                  >
+                    Conversas
+                  </Button>
+                </Tooltip>
+              )}
               <Tooltip title="Retornar para a interface atual">
                 <Button
                   className={classes.classicButton}
@@ -390,14 +685,27 @@ const TicketsV2 = () => {
           </header>
 
           <div className={classes.workspace}>
-            <section className={classes.inbox} aria-label="Lista de atendimentos">
+            <section
+              className={clsx(classes.inbox, {
+                [classes.compactInboxHidden]: isSmall && ticketId,
+              })}
+              aria-label="Lista de atendimentos"
+            >
               <TicketsManagerTabs routeBase={V2_ROUTE} />
             </section>
 
-            <section className={classes.conversation} aria-label="Conversa selecionada">
+            <section
+              className={clsx(classes.conversation, {
+                [classes.compactConversationHidden]: isSmall && !ticketId,
+              })}
+              aria-label="Conversa selecionada"
+            >
               {ticketId ? (
                 <div className={classes.ticketSurface}>
-                  <Ticket routeBase={V2_ROUTE} />
+                  <Ticket
+                    onTicketContextChange={handleTicketContextChange}
+                    routeBase={V2_ROUTE}
+                  />
                 </div>
               ) : (
                 <div className={classes.empty}>
@@ -410,10 +718,23 @@ const TicketsV2 = () => {
               )}
             </section>
 
-            <AiN1Placeholder />
+            <CustomerContext context={ticketContext} />
           </div>
         </div>
       </div>
+
+      <Drawer
+        anchor="right"
+        classes={{ paper: classes.drawerPaper }}
+        onClose={() => setContextDrawerOpen(false)}
+        open={contextDrawerOpen && !contextInline}
+      >
+        <CustomerContext
+          context={ticketContext}
+          drawer
+          onClose={() => setContextDrawerOpen(false)}
+        />
+      </Drawer>
     </QueueSelectedProvider>
   );
 };
