@@ -79,6 +79,25 @@ const useStyles = makeStyles((theme) => ({
         borderTop: "0 !important",
         background: theme.palette.background.paper,
     },
+    modernEmpty: {
+        margin: theme.spacing(5, 2),
+        padding: theme.spacing(2.5, 1.5),
+        border: `1px dashed ${theme.palette.divider}`,
+        borderRadius: 16,
+        background: theme.palette.type === "dark" ? "rgba(255,255,255,.02)" : "#fbfaff",
+    },
+    modernEmptyIcon: {
+        width: 42,
+        height: 42,
+        display: "grid",
+        placeItems: "center",
+        marginBottom: theme.spacing(1.25),
+        color: "#20a57a",
+        borderRadius: 14,
+        background: theme.palette.type === "dark" ? "rgba(32,165,122,.16)" : "#e9f8f2",
+        fontSize: 18,
+        fontWeight: 900,
+    },
 }));
 
 const ticketSortAsc = (a, b) => {
@@ -429,12 +448,13 @@ const TicketsListCustom = (props) => {
             >
                 <List style={{ paddingTop: 0 }} >
                     {ticketsList.length === 0 && !loading ? (
-                        <div className={classes.noTicketsDiv}>
+                        <div className={clsx(classes.noTicketsDiv, modern && classes.modernEmpty)}>
+                            {modern && <span className={classes.modernEmptyIcon}>✓</span>}
                             <span className={classes.noTicketsTitle}>
-                                {i18n.t("ticketsList.noTicketsTitle")}
+                                {modern ? "Tudo em dia por aqui" : i18n.t("ticketsList.noTicketsTitle")}
                             </span>
                             <p className={classes.noTicketsText}>
-                                {i18n.t("ticketsList.noTicketsMessage")}
+                                {modern ? "Nenhuma conversa corresponde aos filtros selecionados." : i18n.t("ticketsList.noTicketsMessage")}
                             </p>
                         </div>
                     ) : (

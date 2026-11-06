@@ -292,7 +292,13 @@ const RoutesContent = () => {
               </LoggedInLayout>
             </WhatsAppsProvider>
           </Switch>
-          <ToastContainer position="top-center" autoClose={3000} />
+          <ToastContainer
+            position="bottom-right"
+            autoClose={3000}
+            newestOnTop
+            closeOnClick
+            pauseOnHover
+          />
         </TicketsContextProvider>
   );
 };

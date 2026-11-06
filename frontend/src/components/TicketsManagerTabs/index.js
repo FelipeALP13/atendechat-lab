@@ -422,12 +422,25 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 900,
   },
   modernSearch: {
-    height: 42,
+    height: 44,
     margin: theme.spacing(0.75, 1.25),
     padding: theme.spacing(0, 0.5),
     border: "1px solid transparent",
     borderRadius: 12,
     background: theme.palette.type === "dark" ? "#20222d" : "#f4f5f8",
+    "& .MuiInputBase-root": { minWidth: 0 },
+    "& .MuiSwitch-root": {
+      flex: "0 0 auto",
+      marginLeft: -5,
+      marginRight: -5,
+      transform: "scale(.82)",
+    },
+    "& .MuiIconButton-root": {
+      width: 32,
+      height: 32,
+      flex: "0 0 auto",
+      padding: 5,
+    },
     "&:focus-within": {
       borderColor: theme.palette.primary.light,
       background: theme.palette.background.paper,
@@ -440,6 +453,19 @@ const useStyles = makeStyles((theme) => ({
     border: 0,
     borderRadius: 12,
     background: theme.palette.type === "dark" ? "#1f212b" : "#f8f8fb",
+    overflowX: "auto",
+    scrollbarWidth: "none",
+    "&::-webkit-scrollbar": { display: "none" },
+    "& .MuiGrid-container": { flexWrap: "nowrap" },
+    "& .MuiGrid-item": {
+      display: "flex",
+      alignItems: "center",
+      whiteSpace: "nowrap",
+    },
+    "& .MuiBadge-root": { flex: "0 0 auto" },
+    "& .MuiIconButton-root, & .MuiToggleButton-root": {
+      marginRight: "5px !important",
+    },
   },
   modernTabsV2: {
     minHeight: 48,
@@ -708,7 +734,7 @@ const TicketsManagerTabs = ({ routeBase = "/tickets", modern = false }) => {
         <InputBase
           className={classes.searchInput}
           inputRef={searchInputRef}
-          placeholder={i18n.t("tickets.search.placeholder")}
+          placeholder={modern ? "Buscar conversas" : i18n.t("tickets.search.placeholder")}
           type="search"
           onChange={handleSearch}
         />

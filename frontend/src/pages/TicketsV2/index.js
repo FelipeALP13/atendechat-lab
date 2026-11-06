@@ -63,8 +63,8 @@ const useStyles = makeStyles(theme => ({
         : "0 18px 44px rgba(38, 31, 71, .10)",
   },
   topbar: {
-    minHeight: 58,
-    padding: theme.spacing(0, 2),
+    minHeight: 52,
+    padding: theme.spacing(0, 1.75),
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -79,8 +79,8 @@ const useStyles = makeStyles(theme => ({
     gap: theme.spacing(1.25),
   },
   mark: {
-    width: 34,
-    height: 34,
+    width: 32,
+    height: 32,
     display: "grid",
     placeItems: "center",
     color: "#fff",
@@ -89,7 +89,7 @@ const useStyles = makeStyles(theme => ({
     boxShadow: "0 8px 20px rgba(109, 57, 232, .24)",
   },
   title: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 800,
     lineHeight: 1.1,
   },
@@ -99,7 +99,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: 11,
   },
   beta: {
-    height: 22,
+    height: 20,
     color: "#5e35b1",
     background: "#eee8ff",
     border: "1px solid #d8cafa",
@@ -121,19 +121,20 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.down("md")]: { display: "none" },
   },
   classicButton: {
-    borderRadius: 9,
+    minHeight: 32,
+    borderRadius: 10,
     textTransform: "none",
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: 700,
   },
   workspace: {
     flex: 1,
     minHeight: 0,
     display: "grid",
-    gridTemplateColumns: "minmax(300px, 342px) minmax(470px, 1fr) 300px",
+    gridTemplateColumns: "minmax(330px, 360px) minmax(470px, 1fr) 300px",
     background: theme.palette.background.default,
     [theme.breakpoints.down(1450)]: {
-      gridTemplateColumns: "minmax(300px, 342px) minmax(470px, 1fr)",
+      gridTemplateColumns: "minmax(330px, 360px) minmax(470px, 1fr)",
     },
     [theme.breakpoints.down("sm")]: {
       gridTemplateColumns: "minmax(0, 1fr)",
@@ -218,6 +219,22 @@ const useStyles = makeStyles(theme => ({
     color: "#6d39e8",
     borderRadius: 22,
     background: theme.palette.type === "dark" ? "#25213a" : "#eee9ff",
+  },
+  emptyGuide: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: theme.spacing(2.5),
+  },
+  emptyStep: {
+    padding: "7px 10px",
+    color: theme.palette.text.secondary,
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 10,
+    background: theme.palette.background.paper,
+    fontSize: 10,
+    fontWeight: 700,
   },
   context: {
     minWidth: 0,
@@ -674,7 +691,7 @@ const TicketsV2 = () => {
             </div>
             <div className={classes.topActions}>
               <span className={classes.preserved}>
-                <CheckCircleOutline fontSize="small" /> Funcionalidades preservadas
+                <CheckCircleOutline fontSize="small" /> Operação em tempo real
               </span>
               {!contextInline && ticketId && (
                 <Tooltip title="Abrir contexto do cliente (Alt + I)">
@@ -747,6 +764,11 @@ const TicketsV2 = () => {
                   <Typography color="textSecondary" variant="body2">
                     A conversa será aberta aqui sem perder sua posição na fila.
                   </Typography>
+                  <div className={classes.emptyGuide}>
+                    <span className={classes.emptyStep}>1. Escolha uma conversa</span>
+                    <span className={classes.emptyStep}>2. Consulte o contexto</span>
+                    <span className={classes.emptyStep}>3. Responda o cliente</span>
+                  </div>
                 </div>
               )}
             </section>
