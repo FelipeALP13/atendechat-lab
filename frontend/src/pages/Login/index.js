@@ -628,7 +628,7 @@ const Login = () => {
             >
                 <aside className={classes.brandPanel} aria-label="Apresentação do AtendeChat">
                     <div className={classes.brandContent}>
-                        <span className={classes.brandPill}>Atendimento omnichannel</span>
+                        <span className={classes.brandPill}>Central de atendimento</span>
                         <h1 className={classes.brandTitle}>
                             Conversas melhores. Equipes mais produtivas.
                         </h1>
