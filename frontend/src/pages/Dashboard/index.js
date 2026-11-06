@@ -61,6 +61,88 @@ import ForbiddenPage from "../../components/ForbiddenPage";
 import { ArrowDownward, ArrowUpward } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
+  dashboardPage: {
+    padding: theme.spacing(2.5),
+    [theme.breakpoints.down("sm")]: { padding: theme.spacing(1.25) },
+  },
+  hero: {
+    position: "relative",
+    overflow: "hidden",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing(2),
+    marginBottom: theme.spacing(2.5),
+    padding: theme.spacing(2.75, 3),
+    color: "#fff",
+    borderRadius: 20,
+    background: "linear-gradient(135deg, #7545ed 0%, #5622bd 62%, #3d178d 100%)",
+    boxShadow: "0 18px 42px rgba(86,34,189,.22)",
+    "&:before": {
+      content: '""',
+      position: "absolute",
+      width: 230,
+      height: 230,
+      right: -55,
+      top: -115,
+      borderRadius: "50%",
+      background: "rgba(255,255,255,.10)",
+    },
+    "&:after": {
+      content: '""',
+      position: "absolute",
+      width: 110,
+      height: 110,
+      right: 150,
+      bottom: -70,
+      borderRadius: "50%",
+      background: "rgba(255,255,255,.07)",
+    },
+    [theme.breakpoints.down("sm")]: {
+      alignItems: "flex-start",
+      flexDirection: "column",
+      padding: theme.spacing(2.25),
+    },
+  },
+  heroCopy: { position: "relative", zIndex: 1 },
+  heroEyebrow: {
+    display: "block",
+    marginBottom: 6,
+    color: "rgba(255,255,255,.72)",
+    fontSize: 10,
+    fontWeight: 900,
+    letterSpacing: ".12em",
+    textTransform: "uppercase",
+  },
+  heroTitle: {
+    margin: 0,
+    color: "#fff",
+    fontSize: 26,
+    fontWeight: 900,
+    letterSpacing: "-.035em",
+    [theme.breakpoints.down("sm")]: { fontSize: 22 },
+  },
+  heroSubtitle: {
+    marginTop: 7,
+    color: "rgba(255,255,255,.76)",
+    fontSize: 12,
+  },
+  heroButton: {
+    position: "relative",
+    zIndex: 1,
+    flex: "0 0 auto",
+    color: "#5c2bc2 !important",
+    background: "#fff !important",
+    boxShadow: "0 8px 20px rgba(36,16,81,.22)",
+    "&:hover": { background: "#f8f5ff !important" },
+  },
+  filterPanel: {
+    marginBottom: theme.spacing(2),
+    padding: theme.spacing(1),
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 16,
+    background: theme.palette.background.paper,
+  },
   overline: {
     fontSize: "0.9rem",
     fontWeight: 700,
@@ -119,7 +201,7 @@ const useStyles = makeStyles((theme) => ({
         : theme.palette.primary.contrastText,
   },
   container: {
-    paddingTop: theme.spacing(1),
+    paddingTop: 0,
     paddingBottom: theme.spacing(1),
   },
   nps: {
@@ -172,10 +254,23 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
   },
   sectionTitle: {
-    fontSize: "1.5rem",
-    fontWeight: 700,
-    color: theme.palette.primary.main,
-    marginBottom: theme.spacing(2),
+    margin: 0,
+    color: theme.palette.text.primary,
+    fontSize: "1.15rem",
+    fontWeight: 900,
+    letterSpacing: "-.02em",
+  },
+  sectionHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: theme.spacing(2.5),
+    marginBottom: theme.spacing(.25),
+    padding: theme.spacing(0, .5),
+  },
+  sectionHint: {
+    color: theme.palette.text.secondary,
+    fontSize: 10.5,
   },
   mainPaper: {
     flex: 1,
@@ -186,10 +281,42 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "10px",
   },
   paper: {
+    position: "relative",
+    overflow: "hidden",
+    height: "100%",
     padding: theme.spacing(2),
-    borderRadius: 12,
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 16,
     backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[1],
+    boxShadow: theme.palette.type === "dark" ? "none" : "0 9px 24px rgba(38,31,71,.06)",
+    transition: "transform .18s ease, box-shadow .18s ease, border-color .18s ease",
+    "&:hover": {
+      transform: "translateY(-3px)",
+      borderColor: theme.palette.type === "dark" ? "rgba(158,122,255,.35)" : "#dcd2f7",
+      boxShadow: theme.palette.type === "dark" ? "none" : "0 15px 32px rgba(67,42,126,.11)",
+    },
+  },
+  metricIcon: {
+    width: 42,
+    height: 42,
+    flex: "0 0 auto",
+    display: "grid",
+    placeItems: "center",
+    borderRadius: 13,
+    background: theme.palette.type === "dark" ? "rgba(109,57,232,.18)" : "#f1ecff",
+    "& svg": { fontSize: 22 },
+  },
+  metricValue: {
+    fontSize: 21,
+    fontWeight: 900,
+    lineHeight: 1.05,
+    letterSpacing: "-.025em",
+  },
+  metricLabel: {
+    marginTop: 5,
+    color: theme.palette.text.secondary,
+    fontSize: 11,
+    fontWeight: 600,
   },
   barContainer: {
     display: "flex",
@@ -211,8 +338,9 @@ const useStyles = makeStyles((theme) => ({
   infoCard: {
     padding: theme.spacing(2),
     textAlign: "center",
-    borderRadius: 12,
-    boxShadow: theme.shadows[1],
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 16,
+    boxShadow: theme.palette.type === "dark" ? "none" : "0 9px 24px rgba(38,31,71,.06)",
     backgroundColor: theme.palette.background.paper,
     marginBottom: theme.spacing(2),
   },
@@ -473,21 +601,29 @@ const Dashboard = () => {
             className={classes.mainPaper}
             variant="outlined"
           >
-            <Container maxWidth={false} className={classes.container} style={{ padding: '16px 8px', maxWidth: '100%', overflowX: 'hidden' }}>
+            <Container maxWidth={false} className={`${classes.container} ${classes.dashboardPage}`} style={{ maxWidth: '100%', overflowX: 'hidden' }}>
+              <div className={classes.hero}>
+                <div className={classes.heroCopy}>
+                  <span className={classes.heroEyebrow}>Central de inteligência operacional</span>
+                  <Typography className={classes.heroTitle} component="h1">
+                    Olá, {user?.name || "equipe"}. Aqui está sua operação.
+                  </Typography>
+                  <div className={classes.heroSubtitle}>
+                    Indicadores de atendimento, qualidade e produtividade em uma única visão.
+                  </div>
+                </div>
+                <Button
+                  className={classes.heroButton}
+                  onClick={toggleShowFilter}
+                  startIcon={!showFilter ? <FilterListIcon /> : <ClearIcon />}
+                  variant="contained"
+                >
+                  {showFilter ? "Ocultar filtros" : "Filtrar período"}
+                </Button>
+              </div>
               <Grid2 container spacing={2} className={classes.container} style={{ margin: 0, width: '100%' }}>
-                {/* FILTROS */}
-                <Grid2 xs={12} container justifyContent="flex-end">
-                  <Button
-                    onClick={toggleShowFilter}
-                    color="primary"
-                    startIcon={!showFilter ? <FilterListIcon /> : <ClearIcon />}
-                  >
-                    {showFilter ? "Ocultar Filtros" : "Mostrar Filtros"}
-                  </Button>
-                </Grid2>
-
                 {showFilter && (
-                  <Grid2 item xs={12} style={{ marginBottom: "20px" }}>
+                  <Grid2 className={classes.filterPanel} item xs={12}>
                     <Filters
                       classes={classes}
                       setDateStartTicket={setDateStartTicket}
@@ -502,8 +638,9 @@ const Dashboard = () => {
                 )}
                 
                 {/* Indicadores Gerais */}
-                <Grid2 item xs={12} style={{ marginTop: '20px', paddingLeft: '4px' }}>
-                  <Typography variant="h5" style={{ marginBottom: '10px', color: theme.palette.primary.main }}>Indicadores</Typography>
+                <Grid2 className={classes.sectionHeader} item xs={12}>
+                  <Typography className={classes.sectionTitle}>Indicadores</Typography>
+                  <span className={classes.sectionHint}>Visão consolidada do período</span>
                 </Grid2>
                 {[
                   { label: "Em Atendimento", value: counters.supportHappening || 0, icon: <CallIcon style={{ color: "#01BBAC" }} /> },
@@ -522,10 +659,10 @@ const Dashboard = () => {
                   <Grid2 item xs={12} sm={6} md={4} lg={3} key={index}>
                     <Paper className={classes.paper}>
                       <Box display="flex" alignItems="center">
-                        {indicator.icon}
+                        <span className={classes.metricIcon}>{indicator.icon}</span>
                         <Box ml={2}>
-                          <Typography variant="h6">{indicator.value}</Typography>
-                          <Typography variant="body2">{indicator.label}</Typography>
+                          <Typography className={classes.metricValue}>{indicator.value}</Typography>
+                          <Typography className={classes.metricLabel}>{indicator.label}</Typography>
                         </Box>
                       </Box>
                     </Paper>
@@ -533,8 +670,9 @@ const Dashboard = () => {
                 ))}
 
                 {/* Pesquisa de Satisfação (NPS) */}
-                <Grid2 item xs={12} style={{ marginTop: '40px', paddingLeft: '4px' }}>
-                  <Typography variant="h5" style={{ marginBottom: '10px', color: theme.palette.primary.main }}>Pesquisa de satisfação</Typography>
+                <Grid2 className={classes.sectionHeader} item xs={12}>
+                  <Typography className={classes.sectionTitle}>Pesquisa de satisfação</Typography>
+                  <span className={classes.sectionHint}>Experiência percebida pelos clientes</span>
                 </Grid2>
                 {["Score", "Promotores", "Neutros", "Detratores"].map((label, index) => (
                   <Grid2 item xs={12} md={6} lg={3} key={index}>
@@ -569,8 +707,9 @@ const Dashboard = () => {
                 ))}
 
                 {/* Informações de Atendimento */}
-                <Grid2 item xs={12} style={{ marginTop: '40px', paddingLeft: '4px' }}>
-                  <Typography variant="h5" style={{ marginBottom: '10px', color: theme.palette.primary.main }}>Atendimentos</Typography>
+                <Grid2 className={classes.sectionHeader} item xs={12}>
+                  <Typography className={classes.sectionTitle}>Atendimentos</Typography>
+                  <span className={classes.sectionHint}>Volume e avaliações registradas</span>
                 </Grid2>
                 {[
                   { label: "Total de Atendimentos", value: counters.tickets || 0, icon: <CallIcon style={{ color: '#01BBAC' }} /> },
@@ -581,10 +720,10 @@ const Dashboard = () => {
                   <Grid2 item xs={12} sm={6} md={3} key={index}>
                     <Paper className={classes.infoCard} style={{ height: '100%' }}>
                       <Box display="flex" alignItems="center">
-                        {attInfo.icon}
+                        <span className={classes.metricIcon}>{attInfo.icon}</span>
                         <Box ml={2}>
-                          <Typography variant="h6">{attInfo.value}</Typography>
-                          <Typography variant="body2">{attInfo.label}</Typography>
+                          <Typography className={classes.metricValue}>{attInfo.value}</Typography>
+                          <Typography className={classes.metricLabel}>{attInfo.label}</Typography>
                         </Box>
                       </Box>
                     </Paper>
@@ -614,8 +753,11 @@ const Dashboard = () => {
                 </Grid2>
 
                 {/* Tabela de Atendentes */}
-                <Grid2 item xs={12} style={{ marginTop: '40px', paddingLeft: '4px' }}>
-                  <Typography variant="h5" style={{ marginBottom: '10px', color: theme.palette.primary.main }}>Atendentes</Typography>
+                <Grid2 item xs={12}>
+                  <div className={classes.sectionHeader}>
+                    <Typography className={classes.sectionTitle}>Atendentes</Typography>
+                    <span className={classes.sectionHint}>Disponibilidade e desempenho da equipe</span>
+                  </div>
                   <Paper className={classes.paper}>
                     <TableAttendantsStatus
                       attendants={attendants}
