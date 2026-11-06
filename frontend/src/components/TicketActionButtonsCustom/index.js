@@ -80,6 +80,41 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "100%",
     // alignItems: "center"
   },
+  modernActions: {
+    marginLeft: "auto",
+    marginRight: 0,
+    padding: theme.spacing(.5),
+    gap: 4,
+    overflowX: "auto",
+    scrollbarWidth: "thin",
+    "& > *": {
+      margin: "0 !important",
+      flex: "0 0 auto",
+    },
+    "& .MuiIconButton-root": {
+      width: 36,
+      height: 36,
+      padding: 7,
+      color: theme.palette.text.secondary,
+      borderRadius: 10,
+      transition: "color .16s ease, background .16s ease",
+      "&:hover": {
+        color: theme.palette.primary.main,
+        background: theme.palette.type === "dark" ? "rgba(109,57,232,.16)" : "#f1ecff",
+      },
+    },
+    "& .MuiButton-root": {
+      minHeight: 36,
+      borderRadius: 10,
+      textTransform: "none",
+      fontWeight: 800,
+    },
+    "& .MuiMenuItem-root": {
+      minHeight: 36,
+      padding: 0,
+      borderRadius: 10,
+    },
+  },
 }));
 
 const SessionSchema = Yup.object().shape({
@@ -90,6 +125,7 @@ const TicketActionButtonsCustom = ({
   ticket,
   contact,
   onQuickMessageSelect,
+  modern = false,
   // , showSelectMessageCheckbox,
   // selectedMessages,
   // forwardMessageModalOpen,
@@ -754,7 +790,7 @@ const TicketActionButtonsCustom = ({
         />
       )}
 
-      <div className={classes.actionButtons}>
+      <div className={`${classes.actionButtons} ${modern ? classes.modernActions : ""}`}>
         {ticket.status === "closed" && (
           <ButtonWithSpinner
             loading={loading}

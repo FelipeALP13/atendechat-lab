@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 
-import { Card, Button } from "@material-ui/core";
+import { Card, IconButton, Tooltip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
 import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
@@ -19,15 +19,37 @@ const useStyles = makeStyles(theme => ({
 			height: 'max-content'
 		},
 	},
+	modernHeader: {
+		minHeight: 72,
+		height: "auto",
+		padding: theme.spacing(.75, 1.25),
+		alignItems: "center",
+		gap: theme.spacing(.5),
+		background: theme.palette.background.paper,
+		borderBottom: `1px solid ${theme.palette.divider}`,
+		boxShadow: theme.palette.type === "dark" ? "none" : "0 4px 18px rgba(48,39,82,.035)",
+	},
+	backButton: {
+		width: 36,
+		height: 36,
+		flex: "0 0 auto",
+		color: theme.palette.text.secondary,
+		border: `1px solid ${theme.palette.divider}`,
+		borderRadius: 11,
+		"&:hover": {
+			color: theme.palette.primary.main,
+			background: theme.palette.type === "dark" ? "rgba(109,57,232,.16)" : "#f1ecff",
+		},
+	},
 }));
 
-const TicketHeader = ({ loading, children }) => {
+const TicketHeader = ({ loading, children, modern = false, routeBase = "/tickets" }) => {
 	const classes = useStyles();
 	const history = useHistory();
 
 	const handleBack = () => {
 
-		history.push("/tickets");
+		history.push(routeBase);
 	};
 
 	// useEffect(() => {
@@ -49,11 +71,13 @@ const TicketHeader = ({ loading, children }) => {
 			) : (
 				<Card
 					square
-					className={classes.ticketHeader}
+					className={`${classes.ticketHeader} ${modern ? classes.modernHeader : ""}`}
 				>
-					<Button color="primary" onClick={handleBack}>
-						<ArrowBackIos />
-					</Button>
+					<Tooltip title="Voltar para as conversas">
+						<IconButton className={modern ? classes.backButton : undefined} color="primary" onClick={handleBack}>
+							<ArrowBackIos fontSize="small" />
+						</IconButton>
+					</Tooltip>
 					{children}
 				</Card>
 			)}

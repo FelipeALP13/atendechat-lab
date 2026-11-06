@@ -33,10 +33,44 @@ const useStyles = makeStyles((theme) => ({
         "&:hover": {
             opacity: 0.8,
         },
-    }
+    },
+    modernInfo: {
+        minWidth: 0,
+        flex: "1 1 auto",
+        "& .MuiCardHeader-root": {
+            padding: theme.spacing(.5, 1),
+        },
+        "& .MuiCardHeader-avatar": {
+            marginRight: theme.spacing(1.25),
+        },
+        "& .MuiAvatar-root": {
+            width: 44,
+            height: 44,
+            borderRadius: 14,
+            boxShadow: "0 0 0 3px rgba(109,57,232,.10)",
+        },
+        "& .MuiCardHeader-title": {
+            fontSize: 14,
+            fontWeight: 900,
+            letterSpacing: "-.01em",
+        },
+        "& .MuiCardHeader-subheader": {
+            marginTop: 2,
+            fontSize: 10.5,
+        },
+    },
+    fullWidthGrid: {
+        width: "100%",
+        margin: 0,
+    },
+    fullWidthItem: {
+        maxWidth: "100%",
+        flexBasis: "100%",
+        padding: "0 !important",
+    },
 }));
 
-const TicketInfo = ({ contact, ticket, onClick }) => {
+const TicketInfo = ({ contact, ticket, onClick, modern = false }) => {
     const classes = useStyles();
     const [amount, setAmount] = useState("");
     const { user } = useContext(AuthContext);
@@ -90,10 +124,15 @@ const TicketInfo = ({ contact, ticket, onClick }) => {
 
     return (
         <React.Fragment>
-            <Grid container alignItems="center" spacing={10}>
+            <Grid
+                className={modern ? classes.fullWidthGrid : undefined}
+                container
+                alignItems="center"
+                spacing={modern ? 0 : 10}
+            >
                 {/* Conteúdo do contato à esquerda */}
-                <Grid item xs={6}>
-                    {renderCardReader()}
+                <Grid className={modern ? classes.fullWidthItem : undefined} item xs={modern ? 12 : 6}>
+                    <div className={modern ? classes.modernInfo : undefined}>{renderCardReader()}</div>
                 </Grid>
             </Grid>
 

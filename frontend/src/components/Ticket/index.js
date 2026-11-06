@@ -64,9 +64,24 @@ const useStyles = makeStyles((theme) => ({
       marginRight: 0,
     },
   },
+  modernMainWrapper: {
+    border: "0 !important",
+    background: theme.palette.background.paper,
+  },
+  modernTicketInfo: {
+    minWidth: 0,
+    flex: "1 1 auto",
+  },
+  modernTags: {
+    flex: "0 0 auto",
+    borderRadius: "0 !important",
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    boxShadow: "none",
+    background: theme.palette.background.paper,
+  },
 }));
 
-const Ticket = ({ routeBase = "/tickets", onTicketContextChange }) => {
+const Ticket = ({ routeBase = "/tickets", onTicketContextChange, modern = false }) => {
   const { ticketId } = useParams();
   const history = useHistory();
   const theme = useTheme();
@@ -228,18 +243,19 @@ const Ticket = ({ routeBase = "/tickets", onTicketContextChange }) => {
       <Paper
         variant="outlined"
         elevation={0}
-        className={clsx(classes.mainWrapper, {
+        className={clsx(classes.mainWrapper, modern && classes.modernMainWrapper, {
           [classes.mainWrapperShift]: drawerOpen && !isMobile,
         })}
       >
         {/* <div id="TicketHeader"> */}
-        <TicketHeader loading={loading}>
+        <TicketHeader loading={loading} modern={modern} routeBase={routeBase}>
           {ticket.contact !== undefined && (
-            <div id="TicketHeader">
+            <div className={modern ? classes.modernTicketInfo : undefined} id="TicketHeader">
               <TicketInfo
                 contact={contact}
                 ticket={ticket}
                 onClick={handleDrawerOpen}
+                modern={modern}
               />
             </div>
           )}
@@ -247,10 +263,11 @@ const Ticket = ({ routeBase = "/tickets", onTicketContextChange }) => {
           ticket={ticket}
           contact={contact}
           onQuickMessageSelect={handleQuickMessageSelect}
+          modern={modern}
         />
         </TicketHeader>
         {/* </div> */}
-        <Paper>
+        <Paper className={modern ? classes.modernTags : undefined}>
           <TagsContainer contact={contact} />
         </Paper>
         <ReplyMessageProvider>

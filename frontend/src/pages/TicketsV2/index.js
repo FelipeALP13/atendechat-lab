@@ -736,6 +736,7 @@ const TicketsV2 = () => {
                   <Ticket
                     onTicketContextChange={handleTicketContextChange}
                     routeBase={V2_ROUTE}
+                    modern
                   />
                 </div>
               ) : (
