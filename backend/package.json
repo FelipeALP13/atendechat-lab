@@ -14,7 +14,10 @@
     "pretest": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test sequelize db:seed:all",
     "test": "NODE_ENV=test jest",
     "posttest": "NODE_ENV=test sequelize db:migrate:undo:all",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "db:migrate:ts": "ts-node --transpile-only src/scripts/migrate.ts",
+    "db:status": "ts-node --transpile-only src/scripts/migrate.ts --status",
+    "seed:demo": "ts-node --transpile-only src/scripts/seed-demo.ts"
   },
   "author": "",
   "license": "MIT",
