@@ -89,7 +89,8 @@ import ShowContactService from "../ContactServices/ShowContactService";
 import { ENABLE_LID_DEBUG } from "../../config/debug";
 import { normalizeJid } from "../../utils";
 import { handleOpenAiFlow } from "../IntegrationsServices/OpenAiService";
-import { askAgent, handoffNote, queueForReason } from "../AgentN1/Runtime";
+import { askAgent, queueForReason } from "../AgentN1/Runtime";
+import { planWhatsappReply } from "../AgentN1/whatsappPlan";
 import { getJidOf } from "./getJidOf";
 import { verifyContact } from "./verifyContact";
 // import { verifyContact } from "./verifyContact";
@@ -3499,20 +3500,10 @@ const handleAgentN1 = async (
     await UpdateTicketService({ ticketData: { queueId: queueId || undefined, isBot: false, status: "pending" }, ticketId: ticket.id, companyId: ticket.companyId });
   };
 
-  // Sem resposta do agente (chave do modelo ausente ou erro): a equipe assume, o cliente não fica no vazio.
-  if (!reply) {
-    await say("Vou chamar uma pessoa da equipe para te atender agora.", 1200);
-    await handOff("low_confidence", "🤖 Agente N1 indisponível neste momento (sem chave do modelo ou erro de comunicação). Atenda normalmente.");
-    return;
-  }
-
-  if (reply.decision === "draft") {
-    await say("Um instante, vou confirmar essa informação para não te passar nada errado.", 1500);
-    await handOff("draft", handoffNote(reply));
-    return;
-  }
-  for (const m of reply.messages) await say(m.text, m.delayMs);
-  if (reply.decision === "handoff") await handOff(reply.reason, handoffNote(reply));
+  // O plano é decidido fora daqui (e testado): o cliente nunca fica sem resposta.
+  const plan = planWhatsappReply(reply);
+  for (const m of plan.messages) await say(m.text, m.delayMs);
+  if (plan.handoff) await handOff(plan.handoff.reason, plan.handoff.note);
 };
 
 const handleOpenAi = async (
