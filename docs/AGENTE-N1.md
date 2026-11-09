@@ -13,3 +13,9 @@ Mensagem nova em ticket sem fila/atendente → regras de segurança → busca na
 
 ## Testes
 `N1_TEST_DB=postgres://... npx jest src/services/AgentN1` (38 passam; 4 casos dependem do modelo real).
+
+## Onde o agente aparece no painel
+- **Agente N1** — configuração, lacunas e propostas, respostas aprovadas, auditoria e consumo.
+- **Site e chat** — o mesmo agente atendendo no site da empresa.
+- **Resultados** — quanto ele resolveu sozinho e quanto custou.
+- Na conversa, o menu de uma mensagem enviada pela equipe tem **Salvar como conhecimento**.
