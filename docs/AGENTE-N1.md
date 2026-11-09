@@ -19,3 +19,8 @@ Mensagem nova em ticket sem fila/atendente → regras de segurança → busca na
 - **Site e chat** — o mesmo agente atendendo no site da empresa.
 - **Resultados** — quanto ele resolveu sozinho e quanto custou.
 - Na conversa, o menu de uma mensagem enviada pela equipe tem **Salvar como conhecimento**.
+
+## Como rodar os testes
+- Backend: `N1_TEST_DB=postgres://... npx jest src/services` (88 casos; 4 dependem do modelo real).
+- Frontend: `npx react-scripts test --watchAll=false --testPathPattern "value.test|novasPaginas"`.
+- Build do frontend: `npm run build`.
