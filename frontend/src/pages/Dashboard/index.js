@@ -63,6 +63,8 @@ import { ArrowDownward, ArrowUpward } from "@material-ui/icons";
 const useStyles = makeStyles((theme) => ({
   dashboardPage: {
     padding: theme.spacing(2.5),
+    minHeight: "100%",
+    background: theme.palette.type === "dark" ? "#10121d" : "#f7f7fb",
     [theme.breakpoints.down("sm")]: { padding: theme.spacing(1.25) },
   },
   hero: {
@@ -138,10 +140,11 @@ const useStyles = makeStyles((theme) => ({
   },
   filterPanel: {
     marginBottom: theme.spacing(2),
-    padding: theme.spacing(1),
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 16,
-    background: theme.palette.background.paper,
+    padding: theme.spacing(1.5),
+    border: theme.palette.type === "dark" ? "1px solid #34384d" : "1px solid #e5e4ee",
+    borderRadius: 18,
+    background: theme.palette.type === "dark" ? "#191c2a" : "#ffffff",
+    boxShadow: theme.palette.type === "dark" ? "0 12px 28px rgba(0,0,0,.16)" : "0 10px 26px rgba(42,31,82,.06)",
   },
   overline: {
     fontSize: "0.9rem",
@@ -277,23 +280,24 @@ const useStyles = makeStyles((theme) => ({
     overflowY: "auto",
     overflowX: "hidden",
     ...theme.scrollbarStyles,
-    backgroundColor: "transparent !important",
-    borderRadius: "10px",
+    backgroundColor: theme.palette.type === "dark" ? "#10121d" : "#f7f7fb",
+    borderRadius: "18px",
+    border: "0 !important",
   },
   paper: {
     position: "relative",
     overflow: "hidden",
     height: "100%",
-    padding: theme.spacing(2),
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 16,
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.palette.type === "dark" ? "none" : "0 9px 24px rgba(38,31,71,.06)",
+    padding: theme.spacing(2.25),
+    border: theme.palette.type === "dark" ? "1px solid #34384d" : "1px solid #e5e4ee",
+    borderRadius: 18,
+    backgroundColor: theme.palette.type === "dark" ? "#1a1d2b" : "#ffffff",
+    boxShadow: theme.palette.type === "dark" ? "0 12px 28px rgba(0,0,0,.14)" : "0 9px 24px rgba(38,31,71,.06)",
     transition: "transform .18s ease, box-shadow .18s ease, border-color .18s ease",
     "&:hover": {
       transform: "translateY(-3px)",
-      borderColor: theme.palette.type === "dark" ? "rgba(158,122,255,.35)" : "#dcd2f7",
-      boxShadow: theme.palette.type === "dark" ? "none" : "0 15px 32px rgba(67,42,126,.11)",
+      borderColor: theme.palette.type === "dark" ? "#6951a8" : "#cfc1f5",
+      boxShadow: theme.palette.type === "dark" ? "0 16px 34px rgba(0,0,0,.20)" : "0 15px 32px rgba(67,42,126,.11)",
     },
   },
   metricIcon: {
@@ -303,7 +307,7 @@ const useStyles = makeStyles((theme) => ({
     display: "grid",
     placeItems: "center",
     borderRadius: 13,
-    background: theme.palette.type === "dark" ? "rgba(109,57,232,.18)" : "#f1ecff",
+    background: theme.palette.type === "dark" ? "#2a2542" : "#f1ecff",
     "& svg": { fontSize: 22 },
   },
   metricValue: {
@@ -316,7 +320,8 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 5,
     color: theme.palette.text.secondary,
     fontSize: 11,
-    fontWeight: 600,
+    fontWeight: 700,
+    lineHeight: 1.25,
   },
   barContainer: {
     display: "flex",
@@ -327,7 +332,20 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     marginRight: theme.spacing(1),
     borderRadius: 5,
-    height: 10,
+    height: 8,
+    backgroundColor: theme.palette.type === "dark" ? "#30354a" : "#ececf3",
+    "& .MuiLinearProgress-bar": {
+      borderRadius: 5,
+      backgroundColor: theme.palette.type === "dark" ? "#a78bfa" : "#6d39e8",
+    },
+  },
+  progressPromoters: { "& .MuiLinearProgress-bar": { backgroundColor: "#39c56b" } },
+  progressNeutrals: { "& .MuiLinearProgress-bar": { backgroundColor: "#f4d63d" } },
+  progressDetractors: { "& .MuiLinearProgress-bar": { backgroundColor: "#ff6258" } },
+  ratingTitle: {
+    marginBottom: 15,
+    color: theme.palette.type === "dark" ? "#d8c9ff" : theme.palette.primary.main,
+    fontWeight: 800,
   },
   progressLabel: {
     minWidth: 50,
@@ -338,10 +356,10 @@ const useStyles = makeStyles((theme) => ({
   infoCard: {
     padding: theme.spacing(2),
     textAlign: "center",
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 16,
-    boxShadow: theme.palette.type === "dark" ? "none" : "0 9px 24px rgba(38,31,71,.06)",
-    backgroundColor: theme.palette.background.paper,
+    border: theme.palette.type === "dark" ? "1px solid #34384d" : "1px solid #e5e4ee",
+    borderRadius: 18,
+    boxShadow: theme.palette.type === "dark" ? "0 12px 28px rgba(0,0,0,.14)" : "0 9px 24px rgba(38,31,71,.06)",
+    backgroundColor: theme.palette.type === "dark" ? "#1a1d2b" : "#ffffff",
     marginBottom: theme.spacing(2),
   },
   infoIcon: {
@@ -643,18 +661,18 @@ const Dashboard = () => {
                   <span className={classes.sectionHint}>Visão consolidada do período</span>
                 </Grid2>
                 {[
-                  { label: "Em Atendimento", value: counters.supportHappening || 0, icon: <CallIcon style={{ color: "#01BBAC" }} /> },
-                  { label: "Aguardando", value: counters.supportPending || 0, icon: <HourglassEmptyIcon style={{ color: "#47606e" }} /> },
-                  { label: "Finalizados", value: counters.supportFinished || 0, icon: <CheckCircleIcon style={{ color: "#5852ab" }} /> },
-                  { label: "Grupos", value: counters.supportGroups || 0, icon: <Groups style={{ color: "#01BBAC" }} /> },
-                  { label: "Atendentes Ativos", value: `${GetUsers()}/${attendants.length}`, icon: <RecordVoiceOverIcon style={{ color: "#805753" }} /> },
-                  { label: "Novos Contatos", value: counters.leads || 0, icon: <GroupAddIcon style={{ color: "#8c6b19" }} /> },
-                  { label: "Mensagens Recebidas", value: `${GetMessages(false, false)}/${GetMessages(true, false)}`, icon: <MessageIcon style={{ color: "#333133" }} /> },
-                  { label: "Mensagens Enviadas", value: `${GetMessages(false, true)}/${GetMessages(true, true)}`, icon: <SendIcon style={{ color: "#558a59" }} /> },
-                  { label: "T.M. de Atendimento", value: formatTime(counters.avgSupportTime), icon: <AccessAlarmIcon style={{ color: "#F79009" }} /> },
-                  { label: "T.M. de Espera", value: formatTime(counters.avgWaitTime), icon: <TimerIcon style={{ color: "#8a2c40" }} /> },
-                  { label: "Tickets Ativos", value: counters.activeTickets || 0, icon: <ArrowUpward style={{ color: "#EE4512" }} /> },
-                  { label: "Tickets Passivos", value: counters.passiveTickets || 0, icon: <ArrowDownward style={{ color: "#28C037" }} /> },
+                  { label: "Em Atendimento", value: counters.supportHappening || 0, icon: <CallIcon style={{ color: "#20c7b4" }} /> },
+                  { label: "Aguardando", value: counters.supportPending || 0, icon: <HourglassEmptyIcon style={{ color: "#a9b6c8" }} /> },
+                  { label: "Finalizados", value: counters.supportFinished || 0, icon: <CheckCircleIcon style={{ color: "#a78bfa" }} /> },
+                  { label: "Grupos", value: counters.supportGroups || 0, icon: <Groups style={{ color: "#20c7b4" }} /> },
+                  { label: "Atendentes Ativos", value: `${GetUsers()}/${attendants.length}`, icon: <RecordVoiceOverIcon style={{ color: "#e3b070" }} /> },
+                  { label: "Novos Contatos", value: counters.leads || 0, icon: <GroupAddIcon style={{ color: "#f4d26a" }} /> },
+                  { label: "Mensagens Recebidas", value: `${GetMessages(false, false)}/${GetMessages(true, false)}`, icon: <MessageIcon style={{ color: "#c2b8dc" }} /> },
+                  { label: "Mensagens Enviadas", value: `${GetMessages(false, true)}/${GetMessages(true, true)}`, icon: <SendIcon style={{ color: "#84d59d" }} /> },
+                  { label: "T.M. de Atendimento", value: formatTime(counters.avgSupportTime), icon: <AccessAlarmIcon style={{ color: "#ffb547" }} /> },
+                  { label: "T.M. de Espera", value: formatTime(counters.avgWaitTime), icon: <TimerIcon style={{ color: "#ff7b91" }} /> },
+                  { label: "Tickets Ativos", value: counters.activeTickets || 0, icon: <ArrowUpward style={{ color: "#ff885f" }} /> },
+                  { label: "Tickets Passivos", value: counters.passiveTickets || 0, icon: <ArrowDownward style={{ color: "#61d3a0" }} /> },
                 ].map((indicator, index) => (
                   <Grid2 item xs={12} sm={6} md={4} lg={3} key={index}>
                     <Paper className={classes.paper}>
@@ -687,13 +705,11 @@ const Dashboard = () => {
                                 label === "Neutros" ? counters.npsPassivePerc || 0 :
                                   counters.npsDetractorsPerc || 0
                           }
-                          className={classes.progressBar}
-                          style={{
-                            backgroundColor:
-                              label === "Promotores" ? "#2EA85A" :
-                                label === "Neutros" ? "#F7EC2C" :
-                                  label === "Detratores" ? "#F73A2C" : "#000",
-                          }}
+                          className={`${classes.progressBar} ${
+                            label === "Promotores" ? classes.progressPromoters :
+                              label === "Neutros" ? classes.progressNeutrals :
+                                label === "Detratores" ? classes.progressDetractors : ""
+                          }`}
                         />
                         <Typography className={classes.progressLabel}>{
                           label === "Score" ? counters.npsScore || 0 :
@@ -712,10 +728,10 @@ const Dashboard = () => {
                   <span className={classes.sectionHint}>Volume e avaliações registradas</span>
                 </Grid2>
                 {[
-                  { label: "Total de Atendimentos", value: counters.tickets || 0, icon: <CallIcon style={{ color: '#01BBAC' }} /> },
-                  { label: "Atendimentos aguardando avaliação", value: counters.waitRating || 0, icon: <HourglassEmptyIcon style={{ color: '#47606e' }} /> },
-                  { label: "Atendimentos sem avaliação", value: counters.withoutRating || 0, icon: <ErrorOutlineIcon style={{ color: '#8a2c40' }} /> },
-                  { label: "Atendimentos avaliados", value: counters.withRating || 0, icon: <CheckCircleOutlineIcon style={{ color: '#805753' }} /> },
+                  { label: "Total de Atendimentos", value: counters.tickets || 0, icon: <CallIcon style={{ color: '#20c7b4' }} /> },
+                  { label: "Atendimentos aguardando avaliação", value: counters.waitRating || 0, icon: <HourglassEmptyIcon style={{ color: '#a9b6c8' }} /> },
+                  { label: "Atendimentos sem avaliação", value: counters.withoutRating || 0, icon: <ErrorOutlineIcon style={{ color: '#ff7b91' }} /> },
+                  { label: "Atendimentos avaliados", value: counters.withRating || 0, icon: <CheckCircleOutlineIcon style={{ color: '#e3b070' }} /> },
                 ].map((attInfo, index) => (
                   <Grid2 item xs={12} sm={6} md={3} key={index}>
                     <Paper className={classes.infoCard} style={{ height: '100%' }}>
@@ -732,7 +748,7 @@ const Dashboard = () => {
 
                 {/* Índice de Avaliação */}
                 <Grid2 item xs={12} style={{ marginTop: '40px', paddingLeft: '4px', paddingRight: '4px' }}>
-                  <Typography variant="h6" style={{ marginBottom: '15px', color: theme.palette.primary.main }}>Índice de avaliação</Typography>
+                  <Typography variant="h6" className={classes.ratingTitle}>Índice de avaliação</Typography>
                   <Grid2 container alignItems="center" spacing={2}>
                     <Grid2 item xs={12} sm={2}>
                       <Paper className={classes.infoCard} style={{ textAlign: 'center', padding: '8px', backgroundColor: '#FFE3B3' }}>
@@ -746,7 +762,6 @@ const Dashboard = () => {
                         variant="determinate"
                         value={counters.percRating || 0}
                         className={classes.progressBar}
-                        style={{ backgroundColor: "#e0e0e0", height: 10, borderRadius: 5 }}
                       />
                     </Grid2>
                   </Grid2>
