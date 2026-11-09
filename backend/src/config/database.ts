@@ -1,5 +1,11 @@
 require("../bootstrap");
 
+/** parseInt(x) || padrao trata 0 como ausente; aqui 0 é um valor válido (DB_POOL_MIN=0). */
+const num = (value: string | undefined, fallback: number): number => {
+  const n = parseInt(String(value), 10);
+  return Number.isFinite(n) ? n : fallback;
+};
+
 
 // são paulo timezone
 
@@ -23,10 +29,10 @@ module.exports = {
     max: 100
   },
   pool: {
-    max: parseInt(process.env.DB_POOL_MAX) || 100,
-    min: parseInt(process.env.DB_POOL_MIN) || 15,
-    acquire: parseInt(process.env.DB_POOL_ACQUIRE) || 30000,
-    idle: parseInt(process.env.DB_POOL_IDLE) || 600000
+    max: num(process.env.DB_POOL_MAX, 100),
+    min: Math.min(num(process.env.DB_POOL_MIN, 15), num(process.env.DB_POOL_MAX, 100)),
+    acquire: num(process.env.DB_POOL_ACQUIRE, 30000),
+    idle: num(process.env.DB_POOL_IDLE, 600000)
   },
   dialect: process.env.DB_DIALECT || "postgres",
   timezone: 'America/Sao_Paulo',
