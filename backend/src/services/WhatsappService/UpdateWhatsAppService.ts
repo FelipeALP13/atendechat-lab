@@ -39,6 +39,7 @@ interface WhatsappData {
   integrationTypeId?: number;
   schedules?: any[];
   promptId?: number;
+  n1Enabled?: boolean;
   requestQR?: boolean;
   collectiveVacationMessage?: string;
   collectiveVacationStart?: string;
@@ -117,6 +118,7 @@ const UpdateWhatsAppService = async ({
     integrationTypeId,
     schedules,
     promptId,
+    n1Enabled,
     requestQR = false,
     collectiveVacationEnd,
     collectiveVacationMessage,
@@ -207,6 +209,7 @@ const UpdateWhatsAppService = async ({
     integrationTypeId,
     schedules,
     promptId: promptId || null,
+    ...(n1Enabled !== undefined ? { n1Enabled: Boolean(n1Enabled) } : {}),
     collectiveVacationEnd,
     collectiveVacationMessage,
     collectiveVacationStart,

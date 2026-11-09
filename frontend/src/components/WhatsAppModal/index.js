@@ -261,6 +261,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
   const { getPlanCompany } = usePlans();
 
   const [selectedPrompt, setSelectedPrompt] = useState(null);
+  const [n1Enabled, setN1Enabled] = useState(false);
   const [triggerIntegrationOnClose, setTriggerIntegrationOnClose] =
     useState(true);
   const [integrationType, setIntegrationType] = useState("n8n");
@@ -381,6 +382,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
         }
 
         setWhatsApp(data);
+        setN1Enabled(Boolean(data.n1Enabled));
         setAttachmentName(data.greetingMediaAttachment);
         setAutoToken(data.token);
         data.promptId
@@ -498,6 +500,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
       token: autoToken ? autoToken : null,
       schedules,
       promptId: selectedPrompt ? selectedPrompt : null,
+      n1Enabled,
       channel,
       triggerIntegrationOnClose: triggerIntegrationOnClose,
       integrationTypeId: triggerIntegrationOnClose ? integrationTypeId : null,
@@ -1295,6 +1298,17 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
                         </Field>
                       </FormControl>
                     )}
+                    <FormControlLabel
+                      style={{ marginTop: 8 }}
+                      control={
+                        <Switch
+                          color="primary"
+                          checked={n1Enabled}
+                          onChange={(e) => setN1Enabled(e.target.checked)}
+                        />
+                      }
+                      label="Agente N1: responder o suporte nível 1 sozinho (transfere para a equipe quando não souber)"
+                    />
                     {showOpenAi && (
                       <FormControl margin="dense" variant="outlined" fullWidth>
                         <InputLabel>

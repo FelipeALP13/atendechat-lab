@@ -14,6 +14,7 @@ import "./database";
 import uploadConfig from "./config/upload";
 import AppError from "./errors/AppError";
 import routes from "./routes";
+import sitePublicRoutes from "./routes/sitePublicRoutes";
 import logger from "./utils/logger";
 import { messageQueue, sendScheduledMessages } from "./queues";
 import BullQueue from "./libs/queue"
@@ -72,6 +73,9 @@ app.use(
   })
 ); // Aumentar o limite de carga para 5 MB
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
+// Chat público do site: CORS por empresa, antes do CORS do painel.
+app.use(sitePublicRoutes);
+
 app.use(
   cors({
     credentials: true,

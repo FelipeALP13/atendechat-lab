@@ -46,6 +46,7 @@ import {
   Description,
   DeviceHubOutlined,
   GridOn,
+  Language,
   PhonelinkSetup,
 } from "@material-ui/icons";
 
@@ -1009,6 +1010,20 @@ const MainListItems = ({ collapsed, drawerClose }) => {
                   tooltip={collapsed}
                 />
               )}
+            />
+
+            <ListItemLink
+              to="/agente-n1"
+              primary="Agente N1"
+              icon={<AllInclusive />}
+              tooltip={collapsed}
+            />
+
+            <ListItemLink
+              to="/site"
+              primary="Site e chat"
+              icon={<Language />}
+              tooltip={collapsed}
             />
 
             {showOpenAi && (

@@ -72,6 +72,7 @@ interface WhatsappData {
   timeCreateNewTicket?: number;
   schedules?: any[];
   promptId?: number;
+  n1Enabled?: boolean;
   collectiveVacationMessage?: string;
   collectiveVacationStart?: string;
   collectiveVacationEnd?: string;

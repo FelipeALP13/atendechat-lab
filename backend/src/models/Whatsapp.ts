@@ -214,6 +214,10 @@ class Whatsapp extends Model<Whatsapp> {
   })
   schedules: [];
 
+  @Default(false)
+  @Column
+  n1Enabled: boolean;
+
   @ForeignKey(() => Prompt)
   @Column
   promptId: number;

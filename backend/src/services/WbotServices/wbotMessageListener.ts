@@ -89,6 +89,7 @@ import ShowContactService from "../ContactServices/ShowContactService";
 import { ENABLE_LID_DEBUG } from "../../config/debug";
 import { normalizeJid } from "../../utils";
 import { handleOpenAiFlow } from "../IntegrationsServices/OpenAiService";
+import { askAgent, handoffNote, queueForReason } from "../AgentN1/Runtime";
 import { getJidOf } from "./getJidOf";
 import { verifyContact } from "./verifyContact";
 // import { verifyContact } from "./verifyContact";
@@ -3434,6 +3435,86 @@ const checkTemporaryAI = async (
   }
 };
 
+
+/**
+ * Agente N1: responde o suporte nível 1 sozinho, com base na documentação da empresa.
+ * Quando não sabe (ou o cliente pede uma pessoa), transfere para a fila do N2 com um resumo em nota interna.
+ */
+const handleAgentN1 = async (
+  msg: proto.IWebMessageInfo,
+  wbot: Session,
+  ticket: Ticket,
+  contact: Contact
+): Promise<void> => {
+  if (contact.disableBot) return;
+  if (msg.messageStubType) return;
+  const bodyMessage = getBodyMessage(msg);
+  const jid = msg.key.remoteJid!;
+
+  // Áudio, imagem e figurinha: o agente ainda não lê esses tipos; pede o texto uma vez e não gasta nada.
+  if (!bodyMessage || ["audioMessage", "imageMessage", "videoMessage", "stickerMessage", "documentMessage"].includes(getTypeMessage(msg))) {
+    const sent = await wbot.sendMessage(jid, { text: "\u200e Por aqui eu ainda não consigo abrir arquivos ou áudios. Pode me contar por texto o que você precisa?" });
+    await verifyMessage(sent!, ticket, contact);
+    return;
+  }
+
+  const previous = await Message.findAll({
+    where: { ticketId: ticket.id, fromMe: false },
+    order: [["id", "DESC"]],
+    limit: 10,
+    attributes: ["body", "wid"]
+  });
+  const history = previous.filter(m => m.wid !== msg.key.id).map(m => m.body).reverse();
+  const spoke = await Message.count({ where: { ticketId: ticket.id, fromMe: true, isPrivate: false } });
+
+  let reply;
+  try {
+    reply = await askAgent({
+      companyId: ticket.companyId,
+      conversationId: String(ticket.id),
+      message: bodyMessage,
+      history,
+      firstMessage: spoke === 0,
+      origin: "whatsapp"
+    });
+  } catch (err) {
+    logger.error({ err, ticketId: ticket.id }, "Agente N1 falhou; transferindo para a equipe");
+    reply = null;
+  }
+
+  const say = async (text: string, delayMs: number) => {
+    try { await wbot.sendPresenceUpdate("composing", jid); } catch { /* presença é opcional */ }
+    await new Promise(r => setTimeout(r, Math.min(delayMs, 4500)));
+    const sent = await wbot.sendMessage(jid, { text: `\u200e ${text}` });
+    await verifyMessage(sent!, ticket, contact);
+  };
+
+  const whatsapp = await ShowWhatsAppService(wbot.id, ticket.companyId);
+  const handOff = async (reason: string, note: string | null) => {
+    const queueId = await queueForReason(ticket.companyId, reason, (whatsapp.queues || []).map(q => q.id));
+    if (note) {
+      const synthetic = { key: { fromMe: true, id: `n1-${ticket.id}-${Date.now()}`, remoteJid: jid }, message: { conversation: note }, messageTimestamp: Math.floor(Date.now() / 1000) } as proto.IWebMessageInfo;
+      await verifyMessage(synthetic, ticket, contact, undefined, true);
+    }
+    await UpdateTicketService({ ticketData: { queueId: queueId || undefined, isBot: false, status: "pending" }, ticketId: ticket.id, companyId: ticket.companyId });
+  };
+
+  // Sem resposta do agente (chave do modelo ausente ou erro): a equipe assume, o cliente não fica no vazio.
+  if (!reply) {
+    await say("Vou chamar uma pessoa da equipe para te atender agora.", 1200);
+    await handOff("low_confidence", "🤖 Agente N1 indisponível neste momento (sem chave do modelo ou erro de comunicação). Atenda normalmente.");
+    return;
+  }
+
+  if (reply.decision === "draft") {
+    await say("Um instante, vou confirmar essa informação para não te passar nada errado.", 1500);
+    await handOff("draft", handoffNote(reply));
+    return;
+  }
+  for (const m of reply.messages) await say(m.text, m.delayMs);
+  if (reply.decision === "handoff") await handOff(reply.reason, handoffNote(reply));
+};
+
 const handleOpenAi = async (
   msg: proto.IWebMessageInfo,
   wbot: Session,
@@ -4673,8 +4754,23 @@ const handleMessage = async (
     }
 
 
+    // Agente N1 na conexão (tem prioridade sobre o prompt de IA antigo)
+    if (
+      ticket.status !== "open" &&
+      !ticket.imported &&
+      !ticket.queue &&
+      !isGroup &&
+      !msg.key.fromMe &&
+      !ticket.userId &&
+      ticket.isBot &&
+      (whatsapp as any).n1Enabled
+    ) {
+      await handleAgentN1(msg, wbot, ticket, contact);
+    }
+
     //openai na conexao
     if (
+      !(whatsapp as any).n1Enabled &&
       ticket.status !== "open" &&
       !ticket.imported &&
       !ticket.queue &&
