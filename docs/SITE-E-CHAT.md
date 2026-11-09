@@ -27,3 +27,6 @@ Conta visitantes diferentes por etapa: abriram o chat, enviaram pergunta, foram 
 
 ## Testes
 `N1_TEST_DB=postgres://... npx jest src/services/SiteService` (31 passam).
+
+## Resultados
+O menu **Resultados** lê a auditoria do agente e os eventos do site: conversas atendidas, percentual resolvido sem a equipe, custo por conversa, série diária, canais, campanhas (utm_campaign) e as maiores lacunas. Rota `GET /results?days=`.

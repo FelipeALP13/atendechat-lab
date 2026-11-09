@@ -47,6 +47,7 @@ import {
   DeviceHubOutlined,
   GridOn,
   Language,
+  TrendingUp,
   PhonelinkSetup,
 } from "@material-ui/icons";
 
@@ -1023,6 +1024,13 @@ const MainListItems = ({ collapsed, drawerClose }) => {
               to="/site"
               primary="Site e chat"
               icon={<Language />}
+              tooltip={collapsed}
+            />
+
+            <ListItemLink
+              to="/resultados"
+              primary="Resultados"
+              icon={<TrendingUp />}
               tooltip={collapsed}
             />
 
