@@ -1011,6 +1011,13 @@ const MainListItems = ({ collapsed, drawerClose }) => {
               )}
             />
 
+            <ListItemLink
+              to="/agente-n1"
+              primary="Agente N1"
+              icon={<AllInclusive />}
+              tooltip={collapsed}
+            />
+
             {showOpenAi && (
               <Can
                 role={user.profile}
