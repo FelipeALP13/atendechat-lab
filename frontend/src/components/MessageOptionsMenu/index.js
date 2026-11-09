@@ -5,7 +5,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
-import { Menu } from "@material-ui/core";
+import { Menu, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@material-ui/core";
+import { toast } from "react-toastify";
 import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import { ForwardMessageContext } from "../../context/ForwarMessage/ForwardMessageContext";
 import { EditMessageContext } from "../../context/EditingMessage/EditingMessageContext";
@@ -31,6 +32,9 @@ const MessageOptionsMenu = ({
 }) => {
   const { setReplyingMessage } = useContext(ReplyMessageContext);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [kbOpen, setKbOpen] = useState(false);
+  const [kbQuestion, setKbQuestion] = useState("");
+  const [kbAnswer, setKbAnswer] = useState("");
   const { user } = useContext(AuthContext);
   const editingContext = useContext(EditMessageContext);
   const setEditingMessage = editingContext ? editingContext.setEditingMessage : null;
@@ -145,8 +149,35 @@ const MessageOptionsMenu = ({
     handleClose();
   };
 
+  const openKb = () => {
+    setKbQuestion("");
+    setKbAnswer(message.body || "");
+    setKbOpen(true);
+    handleClose();
+  };
+  const saveKb = async () => {
+    try {
+      await api.post("/n1/proposals/answer", { question: kbQuestion.trim(), answer: kbAnswer.trim() });
+      toast.success("Enviado para aprovação do administrador (Agente N1).");
+      setKbOpen(false);
+    } catch (err) {
+      toastError(err);
+    }
+  };
+
   return (
     <>
+      <Dialog open={kbOpen} onClose={() => setKbOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Salvar como conhecimento do Agente N1</DialogTitle>
+        <DialogContent>
+          <TextField autoFocus fullWidth margin="dense" variant="outlined" label="Qual era a pergunta do cliente?" value={kbQuestion} onChange={e => setKbQuestion(e.target.value)} />
+          <TextField fullWidth multiline minRows={3} margin="dense" variant="outlined" label="Resposta correta" value={kbAnswer} onChange={e => setKbAnswer(e.target.value)} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setKbOpen(false)}>Cancelar</Button>
+          <Button color="primary" variant="contained" disabled={kbQuestion.trim().length < 5 || kbAnswer.trim().length < 5} onClick={saveKb}>Enviar</Button>
+        </DialogActions>
+      </Dialog>
       <AcceptTicketWithoutQueue
         modalOpen={acceptTicketWithouSelectQueueOpen}
         onClose={(e) => setAcceptTicketWithouSelectQueueOpen(false)}
@@ -206,6 +237,9 @@ const MessageOptionsMenu = ({
         <MenuItem onClick={handleSetShowSelectCheckbox}>
           {i18n.t("messageOptionsMenu.forward")}
         </MenuItem>
+        {message.fromMe && !message.isPrivate && message.body && !message.mediaUrl ? (
+          <MenuItem onClick={openKb}>Salvar como conhecimento</MenuItem>
+        ) : null}
         {!message.fromMe && isGroup && (
           <MenuItem onClick={() => handleSaveTicket(message?.contact?.id)}>
             {i18n.t("messageOptionsMenu.talkTo")}
