@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import api from '../../services/api';
 import { AuthContext } from '../../context/Auth/AuthContext';
 import { toast } from 'react-toastify';
+import { parseValue } from './value';
 import { i18n } from '../../translate/i18n';
 import { useHistory } from 'react-router-dom';
 import { setKanbanLaneOrder, getKanbanLaneOrder } from '../../services/companyKanbanService';
@@ -154,11 +155,10 @@ const Kanban = () => {
     );
   };
 
-  const getOpportunityValue = (ticket) => {
-    const customFields = ticket.contact.extraInfo || [];
+  const getOpportunityValue = ticket => {
+    const customFields = (ticket.contact && ticket.contact.extraInfo) || [];
     const valueField = customFields.find(field => field.name === 'valor');
-    const opportunityValue = valueField ? parseFloat(valueField.value) : 0;
-    return opportunityValue;
+    return valueField ? parseValue(valueField.value) || 0 : 0;
   };
 
   const organizeLanes = (fetchedTags = tags, fetchedTickets = tickets) => {

@@ -18,6 +18,9 @@ import { format, parseISO, isSameDay } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { Draggable } from 'react-beautiful-dnd';
 import api from '../../services/api';
+import toastError from '../../errors/toastError';
+import { toast } from 'react-toastify';
+import { formatBRL, parseValue } from './value';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -152,12 +155,11 @@ const KanbanCard = ({ ticket, index, updateTicket }) => {
       : classes.lastMessageTime;
 
   const customFields = ticket.contact.extraInfo || [];
-  const valueFieldIndex = customFields.findIndex(field => field.name === 'valor');
-  const valueField = valueFieldIndex !== -1 ? customFields[valueFieldIndex] : null;
-  const opportunityValue = valueField ? parseFloat(valueField.value) : null;
+  const valueField = customFields.find(field => field.name === 'valor') || null;
+  const opportunityValue = valueField ? parseValue(valueField.value) : null;
 
   const handleOpenModal = () => {
-    setNewValue(valueField ? valueField.value.toString() : '');
+    setNewValue(valueField ? String(valueField.value) : '');
     setOpen(true);
   };
 
@@ -165,48 +167,39 @@ const KanbanCard = ({ ticket, index, updateTicket }) => {
     setOpen(false);
   };
 
-  const updateContactValue = async (contactId, value) => {
-    try {
-      await api.put(`/contacts/${contactId}`, {
-        extraInfo: [{ name: 'valor', value: value.toString() }],
-      });
-    } catch (error) {
-      console.error('Erro ao atualizar o valor:', error);
-    }
+  /**
+   * O backend troca a lista inteira de campos personalizados do contato,
+   * então enviamos os outros campos junto para não apagá-los.
+   */
+  const saveFields = async fields => {
+    await api.put(`/contacts/${ticket.contact.id}`, { extraInfo: fields });
+    updateTicket({ ...ticket, contact: { ...ticket.contact, extraInfo: fields } });
   };
 
   const removeContactValue = async () => {
     try {
-      await api.put(`/contacts/${ticket.contact.id}`, {
-        extraInfo: [],
-      });
-
-      if (valueFieldIndex !== -1) {
-        customFields.splice(valueFieldIndex, 1);
-      }
-
-      updateTicket({ ...ticket });
-
+      await saveFields(customFields.filter(f => f.name !== 'valor'));
     } catch (error) {
-      console.error('Erro ao remover o valor:', error);
+      toastError(error);
     }
   };
 
   const handleSaveValue = async () => {
-    await updateContactValue(ticket.contact.id, newValue);
-
-    if (valueField) {
-      valueField.value = newValue;
-    } else {
-      if (!ticket.contact.extraInfo) {
-        ticket.contact.extraInfo = [];
-      }
-      ticket.contact.extraInfo.push({ name: 'valor', value: newValue });
+    const value = parseValue(newValue);
+    if (newValue.trim() && value === null) {
+      toast.error('Informe um valor em números, por exemplo 1500,00.');
+      return;
     }
-
-    updateTicket({ ...ticket });
-
-    setOpen(false);
+    try {
+      if (!newValue.trim()) await removeContactValue();
+      else {
+        const others = customFields.filter(f => f.name !== 'valor');
+        await saveFields([...others, { name: 'valor', value: String(value) }]);
+      }
+      setOpen(false);
+    } catch (error) {
+      toastError(error);
+    }
   };
 
   return (
@@ -239,7 +232,7 @@ const KanbanCard = ({ ticket, index, updateTicket }) => {
                 onClick={handleOpenModal}
               >
                 {opportunityValue !== null
-                  ? `Valor: R$ ${opportunityValue.toFixed(2)}`
+                  ? `Valor: ${formatBRL(opportunityValue)}`
                   : 'Atribuir Valor'}
               </Typography>
               {opportunityValue !== null && (
@@ -289,14 +282,14 @@ const KanbanCard = ({ ticket, index, updateTicket }) => {
             <DialogTitle>{valueField ? 'Editar' : 'Atribuir'} Valor da Oportunidade</DialogTitle>
             <DialogContent>
               <TextField
-                label="Valor"
-                type="number"
+                label="Valor (deixe vazio para remover)"
+                type="text"
                 fullWidth
                 value={newValue}
                 onChange={(e) => setNewValue(e.target.value)}
                 variant="outlined"
                 size="small"
-                className={classes.textField} personalizados
+                className={classes.textField}
               />
             </DialogContent>
             <DialogActions>

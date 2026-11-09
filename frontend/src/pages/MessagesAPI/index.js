@@ -6,8 +6,11 @@ import Paper from "@material-ui/core/Paper";
 import { i18n } from "../../translate/i18n";
 import {
   Button,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
   Grid,
+  MenuItem,
   TextField,
   Typography,
 } from "@material-ui/core";
@@ -17,6 +20,7 @@ import { toast } from "react-toastify";
 
 import axios from "axios";
 import usePlans from "../../hooks/usePlans";
+import api from "../../services/api";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
@@ -49,6 +53,8 @@ const MessagesAPI = () => {
     body: "",
     userId: "",
     queueId: "",
+    sendSignature: false,
+    closeTicket: false,
   });
   const [formMessageMediaData] = useState({
     token: "",
@@ -57,7 +63,11 @@ const MessagesAPI = () => {
     body: "",
     userId: "",
     queueId: "",
+    sendSignature: false,
+    closeTicket: false,
   });
+  const [users, setUsers] = useState([]);
+  const [queues, setQueues] = useState([]);
   const [file, setFile] = useState({});
   const { user, socket } = useContext(AuthContext);
 
@@ -80,13 +90,53 @@ const MessagesAPI = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Atendentes e filas para escolher pelo nome, em vez de decorar o número.
+  useEffect(() => {
+    api
+      .get("/users/list")
+      .then((r) => setUsers(Array.isArray(r.data) ? r.data : r.data.users || []))
+      .catch(() => setUsers([]));
+    api
+      .get("/queue")
+      .then((r) => setQueues(r.data || []))
+      .catch(() => setQueues([]));
+  }, []);
+
   const getEndpoint = () => {
     return process.env.REACT_APP_BACKEND_URL + "/api/messages/send";
   };
 
+  /** Campo vazio não vai no corpo: o backend trata ausente e "" de formas diferentes. */
+  const clean = (values) => {
+    const data = { number: values.number, body: values.body };
+    if (values.userId) data.userId = Number(values.userId);
+    if (values.queueId) data.queueId = Number(values.queueId);
+    if (values.sendSignature) data.sendSignature = true;
+    if (values.closeTicket) data.closeTicket = true;
+    return data;
+  };
+
+  const curlFor = (values) => {
+    const data = clean(values);
+    return [
+      `curl -X POST ${getEndpoint()} \\`,
+      `  -H 'Authorization: Bearer ${values.token || "SEU_TOKEN"}' \\`,
+      `  -H 'Content-Type: application/json' \\`,
+      `  -d '${JSON.stringify(data)}'`,
+    ].join("\n");
+  };
+
+  const copyCurl = (values) => {
+    try {
+      navigator.clipboard.writeText(curlFor(values));
+      toast.success("Comando copiado.");
+    } catch (e) {
+      toast.info("Não consegui copiar; selecione o comando manualmente.");
+    }
+  };
+
   const handleSendTextMessage = async (values) => {
-    const { number, body, userId, queueId } = values;
-    const data = { number, body, userId, queueId };
+    const data = clean(values);
     try {
       await axios.request({
         url: getEndpoint(),
@@ -109,8 +159,10 @@ const MessagesAPI = () => {
       const data = new FormData();
       data.append("number", values.number);
       data.append("body", values.body ? values.body : firstFile.name);
-      data.append("userId", values.userId);
-      data.append("queueId", values.queueId);
+      if (values.userId) data.append("userId", values.userId);
+      if (values.queueId) data.append("queueId", values.queueId);
+      if (values.sendSignature) data.append("sendSignature", "true");
+      if (values.closeTicket) data.append("closeTicket", "true");
       data.append("medias", firstFile);
       await axios.request({
         url: getEndpoint(),
@@ -141,7 +193,7 @@ const MessagesAPI = () => {
         }}
         className={classes.elementMargin}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, values }) => (
           <Form className={classes.formContainer}>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -186,28 +238,63 @@ const MessagesAPI = () => {
               <Grid item xs={12} md={6}>
                 <Field
                   as={TextField}
-                  label={i18n.t("messagesAPI.textMessage.userId")}
+                  select
+                  label="Atendente (opcional)"
                   name="userId"
-                  autoFocus
                   variant="outlined"
                   margin="dense"
                   fullWidth
                   className={classes.textField}
-                />
+                >
+                  <MenuItem value="">Nenhum</MenuItem>
+                  {users.map((u) => (
+                    <MenuItem key={u.id} value={u.id}>
+                      {u.name}
+                    </MenuItem>
+                  ))}
+                </Field>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Field
                   as={TextField}
-                  label={i18n.t("messagesAPI.textMessage.queueId")}
+                  select
+                  label="Fila (opcional)"
                   name="queueId"
-                  autoFocus
                   variant="outlined"
                   margin="dense"
                   fullWidth
                   className={classes.textField}
+                >
+                  <MenuItem value="">Nenhuma</MenuItem>
+                  {queues.map((q) => (
+                    <MenuItem key={q.id} value={q.id}>
+                      {q.name}
+                    </MenuItem>
+                  ))}
+                </Field>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Field as={Checkbox} type="checkbox" name="sendSignature" color="primary" />
+                  }
+                  label="Assinar com o nome do atendente"
+                />
+                <FormControlLabel
+                  control={
+                    <Field as={Checkbox} type="checkbox" name="closeTicket" color="primary" />
+                  }
+                  label="Encerrar o ticket depois de enviar"
                 />
               </Grid>
               <Grid item xs={12} className={classes.textRight}>
+                <Button
+                  onClick={() => copyCurl(values)}
+                  color="primary"
+                  className={classes.btnWrapper}
+                >
+                  Copiar comando curl
+                </Button>
                 <Button
                   type="submit"
                   color="primary"
@@ -291,25 +378,53 @@ const MessagesAPI = () => {
               <Grid item xs={12} md={6}>
                 <Field
                   as={TextField}
-                  label={i18n.t("messagesAPI.textMessage.userId")}
+                  select
+                  label="Atendente (opcional)"
                   name="userId"
-                  autoFocus
                   variant="outlined"
                   margin="dense"
                   fullWidth
                   className={classes.textField}
-                />
+                >
+                  <MenuItem value="">Nenhum</MenuItem>
+                  {users.map((u) => (
+                    <MenuItem key={u.id} value={u.id}>
+                      {u.name}
+                    </MenuItem>
+                  ))}
+                </Field>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Field
                   as={TextField}
-                  label={i18n.t("messagesAPI.textMessage.queueId")}
+                  select
+                  label="Fila (opcional)"
                   name="queueId"
-                  autoFocus
                   variant="outlined"
                   margin="dense"
                   fullWidth
                   className={classes.textField}
+                >
+                  <MenuItem value="">Nenhuma</MenuItem>
+                  {queues.map((q) => (
+                    <MenuItem key={q.id} value={q.id}>
+                      {q.name}
+                    </MenuItem>
+                  ))}
+                </Field>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Field as={Checkbox} type="checkbox" name="sendSignature" color="primary" />
+                  }
+                  label="Assinar com o nome do atendente"
+                />
+                <FormControlLabel
+                  control={
+                    <Field as={Checkbox} type="checkbox" name="closeTicket" color="primary" />
+                  }
+                  label="Encerrar o ticket depois de enviar"
                 />
               </Grid>
               <Grid item xs={12}>

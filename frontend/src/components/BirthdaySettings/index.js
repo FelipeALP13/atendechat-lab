@@ -19,8 +19,14 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel
+  InputLabel,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@material-ui/core";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import {
   Cake as CakeIcon,
   Person as PersonIcon,
@@ -34,6 +40,7 @@ import {
 } from "@material-ui/icons";
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
+import toastError from "../../errors/toastError";
 import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
 
 const useStyles = makeStyles((theme) => ({
@@ -141,6 +148,12 @@ const BirthdaySettings = () => {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testOpen, setTestOpen] = useState(false);
+  const [testType, setTestType] = useState("contact");
+  const [testContact, setTestContact] = useState(null);
+  const [testOptions, setTestOptions] = useState([]);
+  const [testLoading, setTestLoading] = useState(false);
+  const [testSending, setTestSending] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     user: true,
     contact: true,
@@ -181,20 +194,40 @@ const BirthdaySettings = () => {
     }
   };
 
-  const handleTestMessage = async (messageType) => {
-    // Para teste, vamos pedir um contato válido
-    const contactId = prompt("Digite o ID de um contato para teste:");
-    if (!contactId) return;
+  // Teste: escolher o contato pelo nome, não por um número que ninguém sabe de cor.
+  const handleTestMessage = (messageType) => {
+    setTestType(messageType);
+    setTestContact(null);
+    setTestOpen(true);
+  };
 
+  const searchContacts = async (term) => {
+    setTestLoading(true);
+    try {
+      const { data } = await api.get("/contacts", {
+        params: { searchParam: term, pageNumber: 1 }
+      });
+      setTestOptions(data.contacts || []);
+    } catch (error) {
+      setTestOptions([]);
+    }
+    setTestLoading(false);
+  };
+
+  const sendTestMessage = async () => {
+    if (!testContact) return;
+    setTestSending(true);
     try {
       await api.post("/birthdays/test-message", {
-        contactId: parseInt(contactId),
-        messageType
+        contactId: testContact.id,
+        messageType: testType
       });
-      toast.success("Mensagem de teste enviada! 📱");
+      toast.success(`Mensagem de teste enviada para ${testContact.name}.`);
+      setTestOpen(false);
     } catch (error) {
-      toast.error("Erro ao enviar mensagem de teste");
+      toastError(error);
     }
+    setTestSending(false);
   };
 
   const toggleSection = (section) => {
@@ -240,6 +273,48 @@ const BirthdaySettings = () => {
 
   return (
     <Box className={classes.root}>
+      <Dialog open={testOpen} onClose={() => setTestOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle>Enviar mensagem de teste</DialogTitle>
+        <DialogContent>
+          <Autocomplete
+            options={testOptions}
+            loading={testLoading}
+            value={testContact}
+            onChange={(e, v) => setTestContact(v)}
+            onInputChange={(e, v) => v && v.length >= 2 && searchContacts(v)}
+            getOptionLabel={(o) => `${o.name} (${o.number})`}
+            getOptionSelected={(o, v) => o.id === v.id}
+            noOptionsText="Digite ao menos duas letras do nome"
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                autoFocus
+                label="Contato que vai receber o teste"
+                variant="outlined"
+                margin="dense"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {testLoading ? <CircularProgress color="inherit" size={18} /> : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  )
+                }}
+              />
+            )}
+          />
+          <Typography variant="body2" color="textSecondary" style={{ marginTop: 8 }}>
+            A mensagem vai com a marca [TESTE] na frente.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTestOpen(false)}>Cancelar</Button>
+          <Button color="primary" variant="contained" disabled={!testContact || testSending} onClick={sendTestMessage}>
+            Enviar
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Typography variant="h4" gutterBottom>
         🎂 Configurações de Aniversário
       </Typography>

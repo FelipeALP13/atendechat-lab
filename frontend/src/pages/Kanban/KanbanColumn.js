@@ -4,6 +4,7 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 import KanbanCard from './KanbanCard';
 import { Typography, IconButton } from '@material-ui/core';
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
+import { formatBRL, sumTickets } from './value';
 
 const useStyles = makeStyles(theme => ({
   column: props => ({
@@ -58,12 +59,7 @@ const useStyles = makeStyles(theme => ({
 const KanbanColumn = ({ id, title, tickets, color, index, updateTicket, isAdmin }) => {
   const classes = useStyles({ color });
 
-  const totalValue = tickets.reduce((acc, ticket) => {
-    const customFields = ticket.contact.extraInfo || [];
-    const valueField = customFields.find(field => field.name === 'valor');
-    const opportunityValue = valueField ? parseFloat(valueField.value) : 0;
-    return acc + opportunityValue;
-  }, 0);
+  const totalValue = sumTickets(tickets);
 
   return (
     <Draggable draggableId={id} index={index}>
@@ -86,7 +82,7 @@ const KanbanColumn = ({ id, title, tickets, color, index, updateTicket, isAdmin 
               <Typography className={classes.columnTitle}>{title}</Typography>
             </div>
             <Typography className={classes.totalValue}>
-              Total: R$ {totalValue.toFixed(2)}
+              {tickets.length} · {formatBRL(totalValue)}
             </Typography>
           </div>
           <Droppable droppableId={id} type="CARD">
