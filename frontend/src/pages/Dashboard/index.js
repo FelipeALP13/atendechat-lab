@@ -138,6 +138,78 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "0 8px 20px rgba(36,16,81,.22)",
     "&:hover": { background: "#f8f5ff !important" },
   },
+  heroActions: {
+    position: "relative",
+    zIndex: 1,
+    display: "flex",
+    alignItems: "center",
+    gap: theme.spacing(1),
+    flexWrap: "wrap",
+    [theme.breakpoints.down("sm")]: { width: "100%" },
+  },
+  refreshBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 7,
+    padding: "8px 11px",
+    borderRadius: 10,
+    color: "rgba(255,255,255,.86)",
+    background: "rgba(255,255,255,.12)",
+    fontSize: 10,
+    fontWeight: 800,
+    whiteSpace: "nowrap",
+    "&:before": {
+      content: '""',
+      width: 7,
+      height: 7,
+      borderRadius: "50%",
+      background: "#56e39f",
+      boxShadow: "0 0 0 3px rgba(86,227,159,.14)",
+    },
+  },
+  filterSummary: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing(1.5),
+    marginBottom: theme.spacing(2.25),
+    padding: theme.spacing(1.1, 1.5),
+    border: theme.palette.type === "dark" ? "1px solid #34384d" : "1px solid #e5e4ee",
+    borderRadius: 14,
+    background: theme.palette.type === "dark" ? "#181b29" : "#ffffff",
+    color: theme.palette.text.secondary,
+    fontSize: 11,
+    [theme.breakpoints.down("sm")]: { alignItems: "flex-start", flexDirection: "column" },
+  },
+  filterSummaryGroup: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+  filterSummaryLabel: {
+    color: theme.palette.text.primary,
+    fontWeight: 800,
+  },
+  filterSummaryValue: {
+    padding: "5px 9px",
+    borderRadius: 8,
+    background: theme.palette.type === "dark" ? "#25293a" : "#f3f1fa",
+    color: theme.palette.type === "dark" ? "#d8c9ff" : "#6030cf",
+    fontWeight: 700,
+  },
+  filterSummaryButton: {
+    flex: "0 0 auto",
+    padding: "5px 10px",
+    border: 0,
+    borderRadius: 8,
+    background: "transparent",
+    color: theme.palette.type === "dark" ? "#cbbcff" : "#6030cf",
+    fontSize: 11,
+    fontWeight: 800,
+    cursor: "pointer",
+    "&:hover": { background: theme.palette.type === "dark" ? "#2d2941" : "#f0ebff" },
+  },
   filterPanel: {
     marginBottom: theme.spacing(2),
     padding: theme.spacing(1.5),
@@ -315,6 +387,14 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 900,
     lineHeight: 1.05,
     letterSpacing: "-.025em",
+  },
+  metricPrimary: {
+    minHeight: 104,
+    borderTop: `3px solid ${theme.palette.type === "dark" ? "#8f6ce8" : "#7650df"}`,
+    "& $metricValue": { fontSize: 26 },
+  },
+  metricSecondary: {
+    minHeight: 92,
   },
   metricLabel: {
     marginTop: 5,
@@ -630,14 +710,31 @@ const Dashboard = () => {
                     Indicadores de atendimento, qualidade e produtividade em uma única visão.
                   </div>
                 </div>
-                <Button
-                  className={classes.heroButton}
-                  onClick={toggleShowFilter}
-                  startIcon={!showFilter ? <FilterListIcon /> : <ClearIcon />}
-                  variant="contained"
-                >
-                  {showFilter ? "Ocultar filtros" : "Filtrar período"}
-                </Button>
+                <div className={classes.heroActions}>
+                  <span className={classes.refreshBadge}>Dados atualizados</span>
+                  <Button
+                    className={classes.heroButton}
+                    onClick={toggleShowFilter}
+                    startIcon={!showFilter ? <FilterListIcon /> : <ClearIcon />}
+                    variant="contained"
+                  >
+                    {showFilter ? "Ocultar filtros" : "Filtrar período"}
+                  </Button>
+                </div>
+              </div>
+              <div className={classes.filterSummary}>
+                <div className={classes.filterSummaryGroup}>
+                  <span className={classes.filterSummaryLabel}>Visão atual</span>
+                  <span className={classes.filterSummaryValue}>
+                    {moment(dateStartTicket).format("DD/MM/YYYY")} — {moment(dateEndTicket).format("DD/MM/YYYY")}
+                  </span>
+                  <span className={classes.filterSummaryValue}>
+                    {queueTicket ? "Fila selecionada" : "Todas as filas"}
+                  </span>
+                </div>
+                <button type="button" className={classes.filterSummaryButton} onClick={toggleShowFilter}>
+                  {showFilter ? "Fechar filtros" : "Editar filtros"}
+                </button>
               </div>
               <Grid2 container spacing={2} className={classes.container} style={{ margin: 0, width: '100%' }}>
                 {showFilter && (
@@ -675,7 +772,7 @@ const Dashboard = () => {
                   { label: "Tickets Passivos", value: counters.passiveTickets || 0, icon: <ArrowDownward style={{ color: "#61d3a0" }} /> },
                 ].map((indicator, index) => (
                   <Grid2 item xs={12} sm={6} md={4} lg={3} key={index}>
-                    <Paper className={classes.paper}>
+                    <Paper className={`${classes.paper} ${index < 4 ? classes.metricPrimary : classes.metricSecondary}`}>
                       <Box display="flex" alignItems="center">
                         <span className={classes.metricIcon}>{indicator.icon}</span>
                         <Box ml={2}>
