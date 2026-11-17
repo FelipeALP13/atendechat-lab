@@ -10,6 +10,7 @@ import Contact from "../../models/Contact";
 import CreateTicketService from "../TicketServices/CreateTicketService";
 // import CreateTicketServiceWebhook from "../TicketServices/CreateTicketServiceWebhook";
 import { SendMessage } from "../../helpers/SendMessage";
+import { encryptSecret } from "../../helpers/secretBox";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import Ticket from "../../models/Ticket";
 import Message from "../../models/Message";
@@ -635,7 +636,8 @@ export const ActionsWebhookService = async (
             voiceRegion: provider === "openai" ? voiceRegion : "",
             maxTokens: Number(maxTokens) || 1000,
             temperature: Number(temperature) || 0.7,
-            apiKey,
+            // Vai para ticket.dataWebhook: grava criptografada (o serviço de IA abre na hora de usar).
+            apiKey: encryptSecret(apiKey) as string,
             queueId: Number(queueId) || 0,
             maxMessages: Number(maxMessages) || 10,
             model,

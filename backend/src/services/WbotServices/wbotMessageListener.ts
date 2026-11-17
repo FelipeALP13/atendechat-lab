@@ -89,6 +89,8 @@ import ShowContactService from "../ContactServices/ShowContactService";
 import { ENABLE_LID_DEBUG } from "../../config/debug";
 import { normalizeJid } from "../../utils";
 import { handleOpenAiFlow } from "../IntegrationsServices/OpenAiService";
+import { customerFirstName, openAiClient, recentTextMessages } from "../IntegrationsServices/aiShared";
+import { handleN1Message } from "../N1AgentService/n1Service";
 import { getJidOf } from "./getJidOf";
 import { verifyContact } from "./verifyContact";
 // import { verifyContact } from "./verifyContact";
@@ -139,10 +141,6 @@ export interface IMe {
 
 const lidUpdateMutex = new Mutex();
 
-interface SessionOpenAi extends OpenAI {
-  id?: number;
-}
-const sessionsOpenAi: SessionOpenAi[] = [];
 
 // Adicionar depois das interfaces existentes:
 interface PhraseCondition {
@@ -2262,11 +2260,6 @@ export const handleRating = async (
     });
 };
 
-const sanitizeName = (name: string): string => {
-  let sanitized = name.split(" ")[0];
-  sanitized = sanitized.replace(/[^a-zA-Z0-9]/g, "");
-  return sanitized.substring(0, 60);
-};
 
 const deleteFileSync = (path: string): void => {
   try {
@@ -3466,28 +3459,14 @@ const handleOpenAi = async (
     `company${ticket.companyId}`
   );
 
-  let openai: OpenAI | any;
-  const openAiIndex = sessionsOpenAi.findIndex(s => s.id === ticket.id);
+  // Cliente reaproveitado por chave (a chave fica criptografada no banco).
+  const openai: OpenAI | any = openAiClient(prompt.apiKey);
 
-  if (openAiIndex === -1) {
-    // const configuration = new Configuration({
-    //   apiKey: prompt.apiKey
-    // });
-    openai = new OpenAI({ apiKey: prompt.apiKey });
-    openai.id = ticket.id;
-    sessionsOpenAi.push(openai);
-  } else {
-    openai = sessionsOpenAi[openAiIndex];
-  }
+  // Últimas mensagens de texto, sem a que acabou de chegar (ela entra no fim do pedido).
+  const messages = await recentTextMessages(ticket.id, prompt.maxMessages, msg?.key?.id);
 
-  const messages = await Message.findAll({
-    where: { ticketId: ticket.id },
-    order: [["createdAt", "ASC"]],
-    limit: prompt.maxMessages
-  });
-
-  const promptSystem = `Nas respostas utilize o nome ${sanitizeName(
-    contact.name || "Amigo(a)"
+  const promptSystem = `Nas respostas utilize o nome ${customerFirstName(
+    contact.name
   )} para identificar o cliente.\nSua resposta deve usar no máximo ${prompt.maxTokens
     } tokens e cuide para não truncar o final.\nSempre que possível, mencione o nome dele para ser mais personalizado o atendimento e mais educado. Quando a resposta requer uma transferência para o setor de atendimento, comece sua resposta com 'Ação: Transferir para o setor de atendimento'.\n
   ${prompt.prompt}\n`;
@@ -4672,6 +4651,13 @@ const handleMessage = async (
       );
     }
 
+
+    // Agente N1 (Claude): atende o começo da conversa nas conexões onde está ligado e passa para a equipe.
+    // Fluxos em andamento (acima) têm prioridade; se o N1 cuidou da mensagem, menus e robôs abaixo não rodam.
+    if (!msg.key.fromMe && !isGroup && !ticket.imported) {
+      const handledByN1 = await handleN1Message({ ticket, contact, text: getBodyMessage(msg) || "" });
+      if (handledByN1) return;
+    }
 
     //openai na conexao
     if (

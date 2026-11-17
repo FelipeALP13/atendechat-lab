@@ -705,6 +705,17 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
                       {ticket.user?.name.toUpperCase()}
                     </Badge>
                   )}
+                  {/* Agente N1: atendendo agora, ou a conversa chegou dele (com resumo na nota privada). */}
+                  {ticket?.n1Status === "active" && !ticket?.user && (
+                    <Badge style={{ backgroundColor: "#6d39e8" }} className={classes.connectionTag} title="O agente N1 está respondendo esta conversa">
+                      N1 ATENDENDO
+                    </Badge>
+                  )}
+                  {ticket?.n1Status === "handed_off" && (
+                    <Badge style={{ backgroundColor: "#8a6fd6" }} className={classes.connectionTag} title="Transferida pelo agente N1; o resumo está na nota privada da conversa">
+                      VEIO DO N1
+                    </Badge>
+                  )}
                 </span>
                 <span className={classes.secondaryContentSecond}>
                   {ticket?.contact?.tags?.map((tag) => {

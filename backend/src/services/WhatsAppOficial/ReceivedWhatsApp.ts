@@ -31,6 +31,7 @@ import VerifyCurrentSchedule from "../CompanyService/VerifyCurrentSchedule";
 import SendWhatsAppOficialMessage from "./SendWhatsAppOficialMessage";
 import typebotListenerOficial from "../TypebotServices/typebotListenerOficial";
 import sgpListenerOficial from "../IntegrationsServices/Sgp/sgpListenerOficial";
+import { handleN1Message } from "../N1AgentService/n1Service";
 
 // ✅ IMPORTAÇÃO DO CHATBOT LISTENER OFICIAL
 import { sayChatbotOficial } from "./ChatBotListenerOficial";
@@ -502,6 +503,13 @@ export class ReceibedWhatsAppService {
         );
         // Evitar processar outras integrações no mesmo ciclo
         return;
+      }
+
+      // Agente N1 (Claude): atende o começo da conversa (inclusive fora do horário) e passa para a equipe.
+      if (!ticket.isGroup && !ticket.imported) {
+        // Texto ou legenda; áudio/imagem sem legenda chegam vazios e o N1 passa para a equipe.
+        const handledByN1 = await handleN1Message({ ticket, contact, text: message.text || "" });
+        if (handledByN1) return;
       }
 
       // ✅ VERIFICAÇÃO DE HORÁRIO DE ATENDIMENTO (mesma lógica do wbotMessageListener)

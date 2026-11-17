@@ -1,6 +1,7 @@
 import {
   AllowNull,
   AutoIncrement,
+  BeforeSave,
   BelongsTo,
   Column,
   CreatedAt,
@@ -12,6 +13,7 @@ import {
 } from "sequelize-typescript";
 import Queue from "./Queue";
 import Company from "./Company";
+import { encryptSecret, maskSecret } from "../helpers/secretBox";
 
 @Table
 class Prompt extends Model<Prompt> {
@@ -82,6 +84,21 @@ class Prompt extends Model<Prompt> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  /** A chave de API é sempre gravada criptografada (vale para criar e editar). */
+  @BeforeSave
+  static encryptApiKey(instance: Prompt): void {
+    if (instance.changed("apiKey") && instance.apiKey) {
+      instance.apiKey = encryptSecret(instance.apiKey) as string;
+    }
+  }
+
+  /** Para a tela: só os 4 últimos caracteres da chave. Para usar a chave, decryptSecret(prompt.apiKey). */
+  toJSON(): object {
+    const values = super.toJSON() as Record<string, unknown>;
+    values.apiKey = maskSecret(values.apiKey as string);
+    return values;
+  }
 }
 
 export default Prompt;

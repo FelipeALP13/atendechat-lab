@@ -16,7 +16,8 @@ export const sendMessageWhatsAppOficial = async (
 
     try {
 
-        checkAPIOficial();
+        // Com await: sem ele, uma falha aqui virava promessa rejeitada sem tratamento e derrubava o servidor.
+        await checkAPIOficial();
         const formData = new FormData();
 
         if (filePath) {

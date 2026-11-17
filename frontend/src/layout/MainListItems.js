@@ -61,7 +61,7 @@ import toastError from "../errors/toastError";
 import usePlans from "../hooks/usePlans";
 import useVersion from "../hooks/useVersion";
 import { i18n } from "../translate/i18n";
-import { Campaign, ShapeLine, Webhook } from "@mui/icons-material";
+import { Campaign, ShapeLine, SmartToy, Webhook } from "@mui/icons-material";
 
 import useCompanySettings from "../hooks/useSettings/companySettings";
 
@@ -1023,6 +1023,15 @@ const MainListItems = ({ collapsed, drawerClose }) => {
                     tooltip={collapsed}
                   />
                 )}
+              />
+            )}
+
+            {user.profile === "admin" && (
+              <ListItemLink
+                to="/n1-agent"
+                primary="Agente N1"
+                icon={<SmartToy />}
+                tooltip={collapsed}
               />
             )}
 

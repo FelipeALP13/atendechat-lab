@@ -63,6 +63,7 @@ import WhatsappLidMap from "../models/WhatsapplidMap";
 import CallHistory from "../models/CallHistory";
 import CompanyKanbanConfig from "../models/CompanyKanbanConfig";
 import MessageApi from "../models/MessageApi";
+import N1Agent from "../models/N1Agent";
 
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
@@ -133,7 +134,8 @@ const models = [
   WhatsappLidMap,
   CallHistory,
   CompanyKanbanConfig,
-  MessageApi
+  MessageApi,
+  N1Agent
 ];
 
 sequelize.addModels(models);

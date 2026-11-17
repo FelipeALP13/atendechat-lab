@@ -2,6 +2,7 @@ import * as Yup from "yup";
 import AppError from "../../errors/AppError";
 import Prompt from "../../models/Prompt";
 import ShowPromptService from "./ShowPromptService";
+import { isMaskedOrEmpty } from "../../helpers/secretBox";
 
 interface PromptData {
     id?: number;
@@ -34,10 +35,13 @@ const UpdatePromptService = async ({
 }: Request): Promise<Prompt | undefined> => {
     const promptTable = await ShowPromptService({ promptId: promptId, companyId });
 
+    // A tela recebe a chave mascarada ("••••abcd"). Se ela volta assim (ou vazia), a chave salva é mantida.
+    const keepKey = isMaskedOrEmpty(promptData.apiKey);
+
     const promptSchema = Yup.object().shape({
         name: Yup.string().required("ERR_PROMPT_NAME_INVALID"),
         prompt: Yup.string().required("ERR_PROMPT_PROMPT_INVALID"),
-        apiKey: Yup.string().required("ERR_PROMPT_APIKEY_INVALID"),
+        apiKey: keepKey ? Yup.string().nullable() : Yup.string().required("ERR_PROMPT_APIKEY_INVALID"),
         queueId: Yup.number().required("ERR_PROMPT_QUEUEID_INVALID"),
         maxMessages: Yup.number().required("ERR_PROMPT_MAX_MESSAGES_INVALID")
     });
@@ -50,7 +54,7 @@ const UpdatePromptService = async ({
         throw new AppError(`${JSON.stringify(err, undefined, 2)}`);
     }
 
-    await promptTable.update({ name, apiKey, prompt, maxTokens, temperature, promptTokens, completionTokens, totalTokens, queueId, maxMessages, voice, voiceKey, voiceRegion });
+    await promptTable.update({ name, ...(keepKey ? {} : { apiKey }), prompt, maxTokens, temperature, promptTokens, completionTokens, totalTokens, queueId, maxMessages, voice, voiceKey, voiceRegion });
     await promptTable.reload();
     return promptTable;
 };

@@ -37,6 +37,7 @@ import CampaignReport from "../pages/CampaignReport";
 import Annoucements from "../pages/Annoucements";
 import Chat from "../pages/Chat";
 import Prompts from "../pages/Prompts";
+import N1Agent from "../pages/N1Agent";
 import AllConnections from "../pages/AllConnections/";
 import Reports from "../pages/Reports";
 import RelatorioVendas from "../pages/RelatorioVendas";
@@ -216,6 +217,7 @@ const RoutesContent = () => {
                   isPrivate
                 />
                 <Route exact path="/prompts" component={Prompts} isPrivate />
+                <Route exact path="/n1-agent" component={N1Agent} isPrivate />
                 <Route
                   exact
                   path="/allConnections"

@@ -20,6 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
+    "@anthropic-ai/sdk": "^1.9.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@google-cloud/dialogflow": "^5.9.0",
     "@google/generative-ai": "^0.24.1",

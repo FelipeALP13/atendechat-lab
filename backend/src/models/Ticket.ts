@@ -11,11 +11,13 @@ import {
   AutoIncrement,
   Default,
   BeforeCreate,
+  BeforeUpdate,
   BelongsToMany,
   AllowNull,
   DataType
 } from "sequelize-typescript";
 import { randomUUID } from "crypto";
+import { redactAiSettings } from "../helpers/secretBox";
 
 import Contact from "./Contact";
 import Message from "./Message";
@@ -211,6 +213,42 @@ class Ticket extends Model<Ticket> {
   @Default(false)
   @Column
   finalizadoComVenda: boolean;
+
+  /** Agente N1: "active" (conversando), "handed_off" (passou para a equipe) ou null (não participou). */
+  @AllowNull
+  @Column(DataType.STRING)
+  n1Status: string | null;
+
+  /** Quantas mensagens do cliente o N1 respondeu neste atendimento. */
+  @Default(0)
+  @Column
+  n1Turns: number;
+
+  /** Atendimento encerrado: se for reaberto, o N1 recomeça do zero. */
+  @BeforeUpdate
+  static resetN1WhenClosed(instance: Ticket): void {
+    if (instance.changed("status") && instance.status === "closed") {
+      instance.n1Status = null;
+      instance.n1Turns = 0;
+    }
+  }
+
+  /**
+   * O que vai para a tela e para o socket: sem a chave da IA (dataWebhook.settings.apiKey)
+   * nem a senha que o cliente digitou para o SGP. Esses dados ficam só no servidor.
+   */
+  toJSON(): object {
+    const values = super.toJSON() as Record<string, unknown>;
+    const data = values.dataWebhook as Record<string, any> | null | undefined;
+    if (data && typeof data === "object") {
+      let safe: Record<string, any> = redactAiSettings(data);
+      if (safe.sgp && typeof safe.sgp === "object" && "senhaUsuario" in safe.sgp) {
+        safe = { ...safe, sgp: { ...safe.sgp, senhaUsuario: safe.sgp.senhaUsuario ? "••••" : "" } };
+      }
+      values.dataWebhook = safe;
+    }
+    return values;
+  }
 }
 
 export default Ticket;

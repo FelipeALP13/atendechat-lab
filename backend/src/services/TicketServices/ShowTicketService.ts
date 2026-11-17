@@ -54,7 +54,9 @@ const ShowTicketService = async (
       "isOutOfHour",
       "isActiveDemand",
       "typebotSessionTime",
-      "hashFlowId"
+      "hashFlowId",
+      "n1Status",
+      "n1Turns"
     ],
     include: [
       {

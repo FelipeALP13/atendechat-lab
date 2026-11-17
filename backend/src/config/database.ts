@@ -22,12 +22,20 @@ module.exports = {
     ],
     max: 100
   },
-  pool: {
-    max: parseInt(process.env.DB_POOL_MAX) || 100,
-    min: parseInt(process.env.DB_POOL_MIN) || 15,
-    acquire: parseInt(process.env.DB_POOL_ACQUIRE) || 30000,
-    idle: parseInt(process.env.DB_POOL_IDLE) || 600000
-  },
+  // "0" é um valor válido (antes `|| 15` trocava DB_POOL_MIN=0 por 15, maior que o máximo, e o banco não conectava).
+  pool: (() => {
+    const read = (name: string, fallback: number) => {
+      const value = parseInt(process.env[name] ?? "", 10);
+      return Number.isFinite(value) && value >= 0 ? value : fallback;
+    };
+    const max = Math.max(1, read("DB_POOL_MAX", 100));
+    return {
+      max,
+      min: Math.min(read("DB_POOL_MIN", 15), max),
+      acquire: read("DB_POOL_ACQUIRE", 30000),
+      idle: read("DB_POOL_IDLE", 600000)
+    };
+  })(),
   dialect: process.env.DB_DIALECT || "postgres",
   timezone: 'America/Sao_Paulo',
   host: process.env.DB_HOST || "localhost",
